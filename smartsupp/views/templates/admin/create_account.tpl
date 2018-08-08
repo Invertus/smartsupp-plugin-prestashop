@@ -47,7 +47,7 @@
                                 <br/>
                                 <div class="input-group">
                                     <input id="SMARTSUPP_DPA" type="checkbox" value="" name="SMARTSUPP_DPA">
-                                    <label id="SMARTSUPP_DPA_LABEL" for="SMARTSUPP_DPA">{l s='I have read and agree with' mod='smartsupp'} <a href='https://www.smartsupp.com/terms' target='_blank'>{l s='Terms' mod='smartsupp'}</a> {l s='and' mod='smartsupp'} <a href='https://www.smartsupp.com/dpa' target='_blank'>{l s='DPA' mod='smartsupp'}</a> {l s=' ' mod='smartsupp'}</label>
+                                    <label id="SMARTSUPP_DPA_LABEL" for="SMARTSUPP_DPA">{l s='I have read and agree with' mod='smartsupp'} <a href="https://www.smartsupp.com/terms" target="_blank">{l s='Terms' mod='smartsupp'}</a> {l s='and' mod='smartsupp'} <a href="https://www.smartsupp.com/dpa" target="_blank">{l s='DPA' mod='smartsupp'}</a> {l s=' ' mod='smartsupp'}</label>
                                 </div>                                        
                         </p>
                         <div class="center-block">
