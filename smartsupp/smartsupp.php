@@ -212,8 +212,12 @@ class Smartsupp extends Module
                     }
                     if (Configuration::get('SMARTSUPP_CUSTOMER_PHONE')) {
                         $addresses = $this->context->customer->getAddresses($this->context->language->id);
-                        $phone = $addresses[0]['phone_mobile'] ? $addresses[0]['phone_mobile'] : $addresses[0]['phone'];
-                        $smartsupp_variables_js .= 'phone : {label: "' . $this->l('Phone') . '", value: "' . $phone . '"}, ';
+
+                        if (!empty($addresses[0])) {
+                            $first_address = $addresses[0];
+                            $phone = !empty($first_address['phone_mobile']) ? $first_address['phone_mobile'] : $first_address['phone'];
+                            $smartsupp_variables_js .= 'phone : {label: "' . $this->l('Phone') . '", value: "' . $phone . '"}, ';
+                        }
                     }
                     if (Configuration::get('SMARTSUPP_CUSTOMER_ROLE')) {
                         $group = new Group($customer->id_default_group, $this->context->language->id, $this->context->shop->id);
