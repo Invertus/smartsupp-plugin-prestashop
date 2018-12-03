@@ -1,8 +1,4 @@
-# Smartsupp plugin - PrestaShop 1.7
-
-## Compatibility
-
-Versions: 1.7.0.0 - 1.7.x.x
+# Smartsupp plugin - PrestaShop
 
 ## Copyright
 
