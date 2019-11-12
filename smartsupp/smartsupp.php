@@ -23,6 +23,8 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+use \Smartsupp\ChatGenerator;
+
 require __DIR__ . '/vendor/autoload.php';
 
 class Smartsupp extends Module
@@ -183,100 +185,81 @@ class Smartsupp extends Module
                 $output;
     }
 
+    /**
+     * @param $smartsupp_key
+     * @return string
+     * @throws Exception
+     */
+    protected function getSmartsuppJs($smartsupp_key)
+    {
+        if (empty($smartsupp_key)) {
+            return '';
+        }
+
+        $chat = new ChatGenerator($smartsupp_key);
+        $chat->setCookieDomain('.' . Tools::getHttpHost(false));
+
+        $customer = $this->context->customer;
+
+        if ($customer->id) {
+            if (Configuration::get('SMARTSUPP_CUSTOMER_ID')) {
+                $chat->setVariable('id', $this->l('ID'), $customer->id);
+            }
+
+            if (Configuration::get('SMARTSUPP_CUSTOMER_NAME')) {
+                $customer_name = $customer->firstname . ' ' . $customer->lastname;
+                $chat->setVariable('name', $this->l('Name'), $customer_name);
+                $chat->setName($customer_name);
+            }
+
+            if (Configuration::get('SMARTSUPP_CUSTOMER_EMAIL')) {
+                $chat->setVariable('email', $this->l('Email'), $customer->email);
+                $chat->setEmail($customer->email);
+            }
+
+            if (Configuration::get('SMARTSUPP_CUSTOMER_PHONE')) {
+                $addresses = $this->context->customer->getAddresses($this->context->language->id);
+                if (!empty($addresses[0])) {
+                    $first_address = $addresses[0];
+                    $phone = !empty($first_address['phone_mobile']) ? $first_address['phone_mobile'] : $first_address['phone'];
+                    $chat->setVariable('phone', $this->l('Phone'), $phone);
+                }
+            }
+
+            if (Configuration::get('SMARTSUPP_CUSTOMER_ROLE')) {
+                $group = new Group($customer->id_default_group, $this->context->language->id, $this->context->shop->id);
+                $chat->setVariable('role', $this->l('Role'), $group->name);
+            }
+
+            if (Configuration::get('SMARTSUPP_CUSTOMER_SPENDINGS') || Configuration::get('SMARTSUPP_CUSTOMER_ORDERS')) {
+                $orders = Order::getCustomerOrders($customer->id, true);
+                $count = 0;
+                $spending = 0;
+                foreach ($orders as $order) {
+                    if ($order['valid']) {
+                        $count++;
+                        $spending += $order['total_paid_real'];
+                    }
+                }
+                if (Configuration::get('SMARTSUPP_CUSTOMER_SPENDINGS')) {
+                    $chat->setVariable('spending', $this->l('Spendings'), Tools::displayPrice($spending, $this->context->currency->id));
+                }
+                if (Configuration::get('SMARTSUPP_CUSTOMER_ORDERS')) {
+                    $chat->setVariable('orders', $this->l('Orders'), $count);
+                }
+            }
+        }
+
+        $custom_code = '<script type="text/javascript">' . trim(Configuration::get('SMARTSUPP_OPTIONAL_API')) . '</script>';
+
+        return $chat->render() . $custom_code;
+    }
+
     public function hookFooter()
     {
         $smartsupp_key = Configuration::get('SMARTSUPP_KEY');
 
-        if ($smartsupp_key) {
-            $smartsupp_cookie_domain = '.' . Tools::getHttpHost(false);
-
-            $optional_api = trim(Configuration::get('SMARTSUPP_OPTIONAL_API'));
-            if ($optional_api && !empty($optional_api)) {
-                $smartsupp_optional_api = trim($optional_api);
-            }
-
-            $customer = $this->context->customer;
-            if ($customer->id) {
-                $smartsupp_dashboard_name = sprintf("%s %s", $customer->firstname, $customer->lastname);
-                $smartsupp_dashboard_email = $customer->email;
-                $smartsupp_variables_enabled = 1;
-
-                if ($smartsupp_variables_enabled) {
-                    $smartsupp_variables_js = '';
-                    if (Configuration::get('SMARTSUPP_CUSTOMER_ID')) {
-                        $smartsupp_variables_js .= 'id : {label: "' . $this->l('ID') . '", value: "' . $customer->id . '"},';
-                    }
-                    if (Configuration::get('SMARTSUPP_CUSTOMER_NAME')) {
-                        $smartsupp_variables_js .= 'name : {label: "' . $this->l('Name') . '", value: "' . $customer->firstname . ' ' . $customer->lastname . '"},';
-                    }
-                    if (Configuration::get('SMARTSUPP_CUSTOMER_EMAIL')) {
-                        $smartsupp_variables_js .= 'email : {label: "' . $this->l('Email') . '", value: "' . $customer->email . '"}, ';
-                    }
-                    if (Configuration::get('SMARTSUPP_CUSTOMER_PHONE')) {
-                        $addresses = $this->context->customer->getAddresses($this->context->language->id);
-
-                        if (!empty($addresses[0])) {
-                            $first_address = $addresses[0];
-                            $phone = !empty($first_address['phone_mobile']) ? $first_address['phone_mobile'] : $first_address['phone'];
-                            $smartsupp_variables_js .= 'phone : {label: "' . $this->l('Phone') . '", value: "' . $phone . '"}, ';
-                        }
-                    }
-                    if (Configuration::get('SMARTSUPP_CUSTOMER_ROLE')) {
-                        $group = new Group($customer->id_default_group, $this->context->language->id, $this->context->shop->id);
-                        $smartsupp_variables_js .= 'role : {label: "' . $this->l('Role') . '", value: "' . $group->name . '"}, ';
-                    }
-                    if (Configuration::get('SMARTSUPP_CUSTOMER_SPENDINGS') || Configuration::get('SMARTSUPP_CUSTOMER_ORDERS')) {
-                        $orders = Order::getCustomerOrders($customer->id, true);
-                        $count = 0;
-                        $spendings = 0;
-                        foreach ($orders as $order) {
-                            if ($order['valid']) {
-                                $count++;
-                                $spendings += $order['total_paid_real'];
-                            }
-                        }
-                        if (Configuration::get('SMARTSUPP_CUSTOMER_SPENDINGS')) {
-                            $smartsupp_variables_js .= 'spendings : {label: "' . $this->l('Spendings') . '", value: "' . Tools::displayPrice($spendings, $this->context->currency->id) . '"}, ';
-                        }
-                        if (Configuration::get('SMARTSUPP_CUSTOMER_ORDERS')) {
-                            $smartsupp_variables_js .= 'orders : {label: "' . $this->l('Orders') . '", value: "' . $count . '"}, ';
-                        }
-                    }
-                    $smartsupp_variables_js = trim($smartsupp_variables_js, ', ');
-                }
-            } else {
-                $smartsupp_dashboard_name = '';
-                $smartsupp_dashboard_email = '';
-                $smartsupp_variables_enabled = '0';
-                $smartsupp_variables_js = '';
-            }
-
-            $script = '<!-- Smartsupp Live Chat script -->';
-            $script .= '<script type="text/javascript">';
-            if ($smartsupp_variables_enabled && !empty($smartsupp_variables_js)) {
-                $script .= "var prSmartsuppVars = {" . $smartsupp_variables_js . "};";
-            }
-            $script .= "var _smartsupp = _smartsupp || {};";
-            $script .= "_smartsupp.key = '" . $smartsupp_key . "';";
-            $script .= "_smartsupp.cookieDomain = '" . $smartsupp_cookie_domain . "';";
-            $script .= "window.smartsupp||(function(d) {";
-            $script .= "var s,c,o=smartsupp=function(){o._.push(arguments)};o._=[];";
-            $script .= "s=d.getElementsByTagName('script')[0];c=d.createElement('script');";
-            $script .= "c.type='text/javascript';c.charset='utf-8';c.async=true;";
-            $script .= "c.src='//www.smartsuppchat.com/loader.js?';s.parentNode.insertBefore(c,s);";
-            $script .= "})(document);";
-            $script .= "smartsupp('name', '" . $smartsupp_dashboard_name . "');";
-            $script .= "smartsupp('email', '" . $smartsupp_dashboard_email . "');";
-            if ($smartsupp_variables_enabled && !empty($smartsupp_variables_js)) {
-                $script .= "smartsupp('variables', prSmartsuppVars);";
-            }
-            if (isset($smartsupp_optional_api)) {
-                $script .= $smartsupp_optional_api;
-            }
-            $script .= '</script>';
-            return $script;
-        }
-        return '';
+        return $this->getSmartsuppJs($smartsupp_key);
     }
 
     public function hookBackOfficeHeader()
@@ -296,7 +279,6 @@ class Smartsupp extends Module
                        '<link rel="stylesheet" href="' . $this->_path . 'views/css/smartsupp-nobootstrap.css" type="text/css" />';
             }
         }
-
 
         return $js;
     }
