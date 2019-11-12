@@ -43,7 +43,12 @@ class AdminSmartsuppAjaxController extends ModuleAdminController
                 
         switch (Tools::getValue('action')) {
             case 'login':
-                $response = $api->login(array('email' => Tools::getValue('email'), 'password' => Tools::getValue('password')));
+                $response = $api->login(array(
+                    'email' => Tools::getValue('email'),
+                    'password' => Tools::getValue('password'),
+                    'platform' => 'Prestashop ' . _PS_VERSION_,
+                ));
+
                 Configuration::updateValue('SMARTSUPP_KEY', $response['account']['key']);
                 Configuration::updateValue('SMARTSUPP_EMAIL', Tools::getValue('email'));
                 break;
@@ -52,7 +57,15 @@ class AdminSmartsuppAjaxController extends ModuleAdminController
                 if (array_key_exists($language, $this->languageMap)) {
                     $language = $this->languageMap[$language];
                 }
-                $response = $api->create(array('email' => Tools::getValue('email'), 'password' => Tools::getValue('password'), 'partnerKey' => $this->partnerKey, 'lang' => $language, 'consentTerms' => 1));
+                $response = $api->create(array(
+                    'email' => Tools::getValue('email'),
+                    'password' => Tools::getValue('password'),
+                    'partnerKey' => $this->partnerKey,
+                    'lang' => $language,
+                    'consentTerms' => 1,
+                    'platform' => 'Prestashop ' . _PS_VERSION_,
+                ));
+
                 Configuration::updateValue('SMARTSUPP_KEY', $response['account']['key']);
                 Configuration::updateValue('SMARTSUPP_EMAIL', Tools::getValue('email'));
                 break;

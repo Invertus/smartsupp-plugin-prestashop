@@ -197,6 +197,7 @@ class Smartsupp extends Module
         }
 
         $chat = new ChatGenerator($smartsupp_key);
+        $chat->setPlatform('Prestashop ' . _PS_VERSION_);
         $chat->setCookieDomain('.' . Tools::getHttpHost(false));
 
         $customer = $this->context->customer;
