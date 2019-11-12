@@ -25,13 +25,6 @@ class AdminSmartsuppAjaxController extends ModuleAdminController
 {
     public $ssl = true;
     private $partnerKey = 'h4w6t8hln9';
-    private $languageMap = array(
-        'ag' => 'es',
-        'mx' => 'es',
-        'qc' => 'fr',
-        'dh' => 'de',
-        'gb' => 'en',
-    );
 
     public function init()
     {
@@ -53,15 +46,10 @@ class AdminSmartsuppAjaxController extends ModuleAdminController
                 Configuration::updateValue('SMARTSUPP_EMAIL', Tools::getValue('email'));
                 break;
             case 'create':
-                $language = strtolower($this->context->language->iso_code);
-                if (array_key_exists($language, $this->languageMap)) {
-                    $language = $this->languageMap[$language];
-                }
                 $response = $api->create(array(
                     'email' => Tools::getValue('email'),
                     'password' => Tools::getValue('password'),
                     'partnerKey' => $this->partnerKey,
-                    'lang' => $language,
                     'consentTerms' => 1,
                     'platform' => 'Prestashop ' . _PS_VERSION_,
                 ));
