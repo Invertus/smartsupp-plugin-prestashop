@@ -1,25 +1,13 @@
 <?php
-/**
- * Smartsupp Live Chat integration module.
- * 
- * @package   Smartsupp
- * @author    Smartsupp <vladimir@smartsupp.com>
- * @link      http://www.smartsupp.com
- * @copyright 2016 Smartsupp.com
- * @license   GPL-2.0+
- *
- * Plugin Name:       Smartsupp Live Chat
- * Plugin URI:        http://www.smartsupp.com
- * Description:       Adds Smartsupp Live Chat code to PrestaShop.
- * Version:           2.1.6
- * Author:            Smartsupp
- * Author URI:        http://www.smartsupp.com
- * Text Domain:       smartsupp
- * License:           GPL-2.0+
- * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
- */
+namespace Smartsupp\Auth\Request;
 
-class SmartsuppAuthCurlRequest implements SmartsuppAuthHttpRequest
+/**
+ * Class CurlRequest implements basic functionality to handle cURL requests.
+ * It is used to better mock this communication in PHPUnit tests.
+ *
+ * @package Smartsupp\Request
+ */
+class CurlRequest implements HttpRequest
 {
     /**
      * Curl handler resource.
@@ -53,7 +41,7 @@ class SmartsuppAuthCurlRequest implements SmartsuppAuthHttpRequest
      * Set cURL option with given value.
      *
      * @param string $name option name
-     * @param string $value option value
+     * @param string|array $value option value
      */
     public function setOption($name, $value)
     {

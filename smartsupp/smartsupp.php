@@ -23,6 +23,8 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+require __DIR__ . '/vendor/autoload.php';
+
 class Smartsupp extends Module
 {
 

@@ -19,6 +19,8 @@
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  */
 
+use \Smartsupp\Auth\Api;
+
 class AdminSmartsuppAjaxController extends ModuleAdminController
 {
     public $ssl = true;
@@ -37,7 +39,7 @@ class AdminSmartsuppAjaxController extends ModuleAdminController
         require_once _PS_MODULE_DIR_ . 'smartsupp/classes/Auth/Request/HttpRequest.php';
         require_once _PS_MODULE_DIR_ . 'smartsupp/classes/Auth/Request/CurlRequest.php';        
                 
-        $api = new SmartsuppAuthApi();
+        $api = new Api();
                 
         switch (Tools::getValue('action')) {
             case 'login':

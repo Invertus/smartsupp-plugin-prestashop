@@ -1,23 +1,9 @@
 <?php
-/**
- * Smartsupp Live Chat integration module.
- * 
- * @package   Smartsupp
- * @author    Smartsupp <vladimir@smartsupp.com>
- * @link      http://www.smartsupp.com
- * @copyright 2016 Smartsupp.com
- * @license   GPL-2.0+
- *
- * Plugin Name:       Smartsupp Live Chat
- * Plugin URI:        http://www.smartsupp.com
- * Description:       Adds Smartsupp Live Chat code to PrestaShop.
- * Version:           2.1.6
- * Author:            Smartsupp
- * Author URI:        http://www.smartsupp.com
- * Text Domain:       smartsupp
- * License:           GPL-2.0+
- * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
- */
+namespace Smartsupp\Auth;
+
+use Exception;
+use Smartsupp\Auth\Request\CurlRequest;
+use Smartsupp\Auth\Request\HttpRequest;
 
 /**
  * Class to communicate with Smartsupp partner API.
@@ -30,8 +16,7 @@
  * @version    Git: $Id$
  * @link       https://github.com/smartsupp/php-partner-client
  */
-
-class SmartsuppAuthApi
+class Api
 {
     /** API call base URL */
     const API_BASE_URL = 'https://www.smartsupp.com/';
@@ -51,18 +36,18 @@ class SmartsuppAuthApi
      * @param null|HttpRequest $handle inject custom request handle to better unit test
      * @throws Exception
      */
-    public function __construct(SmartsuppAuthHttpRequest $handle = null)
+    public function __construct(HttpRequest $handle = null)
     {
-        // @codeCoverageIgnoreStart
+// @codeCoverageIgnoreStart
         if (!function_exists('curl_init')) {
             throw new Exception('Smartsupp API client needs the CURL PHP extension.');
         }
         if (!function_exists('json_decode')) {
             throw new Exception('Smartsupp API client needs the JSON PHP extension.');
         }
-        // @codeCoverageIgnoreEnd
+// @codeCoverageIgnoreEnd
 
-        $this->handle = $handle ?: new SmartsuppAuthCurlRequest();
+        $this->handle = $handle ?: new CurlRequest();
     }
 
     /**
@@ -116,9 +101,16 @@ class SmartsuppAuthApi
         $this->handle->setOption(CURLOPT_URL, self::API_BASE_URL . $path);
         $this->handle->setOption(CURLOPT_RETURNTRANSFER, true);
         $this->handle->setOption(CURLOPT_FAILONERROR, false);
-        $this->handle->setOption(CURLOPT_SSL_VERIFYPEER, false);
+        $this->handle->setOption(CURLOPT_SSL_VERIFYPEER, true);
         $this->handle->setOption(CURLOPT_SSL_VERIFYHOST, 2);
         $this->handle->setOption(CURLOPT_USERAGENT, 'cURL:php-partner-client');
+
+        // forward headers from request
+        $headers = array(
+            'X-Forwarded-For: ' . $this->getUserIpAddr(),
+            'Accept-Language: ' . $this->getAcceptLanguage(),
+        );
+        $this->handle->setOption(CURLOPT_HTTPHEADER, $headers);
 
         switch ($method) {
             case 'post':
@@ -135,6 +127,43 @@ class SmartsuppAuthApi
 
         $this->handle->close();
 
-        return $json_decode ? Tools::jsonDecode($response, true) : $response;
+        if ($json_decode) {
+            $response = json_decode($response, true);
+
+            if (json_last_error() != JSON_ERROR_NONE) {
+                throw new Exception('Cannot parse API response JSON. Error: ' . json_last_error_msg());
+            }
+        }
+
+        return $response;
+    }
+
+    /**
+     * Return user IP address.
+     *
+     * @return string|null
+     */
+    private function getUserIpAddr()
+    {
+        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+            // ip from share internet
+            return $_SERVER['HTTP_CLIENT_IP'];
+        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            // ip pass from proxy
+            return $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else {
+            // in case is not set - may be in CLI
+            return isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
+        }
+    }
+
+    /**
+     * Get Accept-Language header.
+     *
+     * @return string|null
+     */
+    private function getAcceptLanguage()
+    {
+        return isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : null;
     }
 }
