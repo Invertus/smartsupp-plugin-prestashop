@@ -26,5 +26,5 @@
     "prepend-autoloader": false
   },
   "type": "prestashop-module",
-  "license": "GPL"
+  "license": "GPL-2.0-or-later"
 }
