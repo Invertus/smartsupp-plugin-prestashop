@@ -28,10 +28,6 @@ class AdminSmartsuppAjaxController extends ModuleAdminController
 
     public function init()
     {
-        require_once _PS_MODULE_DIR_ . 'smartsupp/classes/Auth/Api.php';
-        require_once _PS_MODULE_DIR_ . 'smartsupp/classes/Auth/Request/HttpRequest.php';
-        require_once _PS_MODULE_DIR_ . 'smartsupp/classes/Auth/Request/CurlRequest.php';        
-                
         $api = new Api();
                 
         switch (Tools::getValue('action')) {
