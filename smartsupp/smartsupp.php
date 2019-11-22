@@ -72,7 +72,7 @@ class Smartsupp extends Module
         $tab->id_parent = -1;
         $tab->module = $this->name;
 
-        if (!$tab->add() || !parent::install() || !$this->registerHook('footer') || !$this->registerHook('backOfficeHeader') || !Configuration::updateValue('SMARTSUPP_KEY', '') || !Configuration::updateValue('SMARTSUPP_EMAIL', '') || !Configuration::updateValue('SMARTSUPP_CUSTOMER_ID', '1') || !Configuration::updateValue('SMARTSUPP_CUSTOMER_NAME', '1') || !Configuration::updateValue('SMARTSUPP_CUSTOMER_EMAIL', '1') || !Configuration::updateValue('SMARTSUPP_CUSTOMER_PHONE', '1') || !Configuration::updateValue('SMARTSUPP_CUSTOMER_ROLE', '1') || !Configuration::updateValue('SMARTSUPP_CUSTOMER_SPENDINGS', '1') || !Configuration::updateValue('SMARTSUPP_CUSTOMER_ORDERS', '1') || !Configuration::updateValue('SMARTSUPP_OPTIONAL_API', '')
+        if (!$tab->add() || !parent::install() || !$this->registerHook('header') || !$this->registerHook('backOfficeHeader') || !Configuration::updateValue('SMARTSUPP_KEY', '') || !Configuration::updateValue('SMARTSUPP_EMAIL', '') || !Configuration::updateValue('SMARTSUPP_CUSTOMER_ID', '1') || !Configuration::updateValue('SMARTSUPP_CUSTOMER_NAME', '1') || !Configuration::updateValue('SMARTSUPP_CUSTOMER_EMAIL', '1') || !Configuration::updateValue('SMARTSUPP_CUSTOMER_PHONE', '1') || !Configuration::updateValue('SMARTSUPP_CUSTOMER_ROLE', '1') || !Configuration::updateValue('SMARTSUPP_CUSTOMER_SPENDINGS', '1') || !Configuration::updateValue('SMARTSUPP_CUSTOMER_ORDERS', '1') || !Configuration::updateValue('SMARTSUPP_OPTIONAL_API', '')
         ) {
             return false;
         }
@@ -89,7 +89,7 @@ class Smartsupp extends Module
             $tab->delete();
         }
 
-        if (!parent::uninstall() || !$this->unregisterHook('footer') || !$this->unregisterHook('backOfficeHeader') || !Configuration::deleteByName('SMARTSUPP_KEY') || !Configuration::deleteByName('SMARTSUPP_EMAIL') || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_ID', '') || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_NAME', '') || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_EMAIL', '') || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_PHONE', '') || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_ROLE', '') || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_SPENDINGS', '') || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_ORDERS', '') || !Configuration::deleteByName('SMARTSUPP_OPTIONAL_API', '')
+        if (!parent::uninstall() || !$this->unregisterHook('header') || !$this->unregisterHook('backOfficeHeader') || !Configuration::deleteByName('SMARTSUPP_KEY') || !Configuration::deleteByName('SMARTSUPP_EMAIL') || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_ID', '') || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_NAME', '') || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_EMAIL', '') || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_PHONE', '') || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_ROLE', '') || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_SPENDINGS', '') || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_ORDERS', '') || !Configuration::deleteByName('SMARTSUPP_OPTIONAL_API', '')
         ) {
             return false;
         }
@@ -256,11 +256,12 @@ class Smartsupp extends Module
         return $chat->render() . $custom_code;
     }
 
-    public function hookFooter()
+    public function hookHeader()
     {
         $smartsupp_key = Configuration::get('SMARTSUPP_KEY');
+        $this->smarty->assign(array('smartsupp_js' => $this->getSmartsuppJs($smartsupp_key)));
 
-        return $this->getSmartsuppJs($smartsupp_key);
+        return $this->display(__FILE__, './views/templates/front/chat_widget.tpl');
     }
 
     public function hookBackOfficeHeader()
