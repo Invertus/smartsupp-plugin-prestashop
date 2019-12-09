@@ -11,7 +11,7 @@
  * Plugin Name:       Smartsupp Live Chat
  * Plugin URI:        http://www.smartsupp.com
  * Description:       Adds Smartsupp Live Chat code to PrestaShop.
- * Version:           2.1.7
+ * Version:           2.1.8
  * Author:            Smartsupp
  * Author URI:        http://www.smartsupp.com
  * Text Domain:       smartsupp
@@ -23,8 +23,6 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use \Smartsupp\ChatGenerator;
-
 require __DIR__ . '/vendor/autoload.php';
 
 class Smartsupp extends Module
@@ -34,7 +32,7 @@ class Smartsupp extends Module
     {
         $this->name = 'smartsupp';
         $this->tab = 'advertising_marketing';
-        $this->version = '2.1.7';
+        $this->version = '2.1.8';
         $this->author = 'Smartsupp';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
@@ -196,7 +194,8 @@ class Smartsupp extends Module
             return '';
         }
 
-        $chat = new ChatGenerator($smartsupp_key);
+        // NEVER ever put it into use statement as this will break Presta 1.6 installation - they use eval which does not run PSR autoloader
+        $chat = new \Smartsupp\ChatGenerator($smartsupp_key);
         $chat->setPlatform('Prestashop ' . _PS_VERSION_);
         $chat->setCookieDomain('.' . Tools::getHttpHost(false));
 
