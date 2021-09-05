@@ -177,7 +177,6 @@ class Smartsupp extends Module
         ));
 
         return $this->display(__FILE__, 'views/templates/admin/landing_page.tpl') .
-                $this->display(__FILE__, 'views/templates/admin/create_account.tpl') .
                 $this->display(__FILE__, 'views/templates/admin/connect_account.tpl') .
                 $this->display(__FILE__, 'views/templates/admin/configuration.tpl') .
                 $output;
