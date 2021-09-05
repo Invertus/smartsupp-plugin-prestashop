@@ -19,60 +19,47 @@
  *}
 
 <div id="smartsupp_connect_account" class="panel">
-	<div class="row">
-		<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-			<img src="{$module_dir|escape:'html':'UTF-8'}views/img/smartsupp_logo.png" alt="Smartsupp" />
+	<header class="header">
+		<img src="{$module_dir|escape:'html':'UTF-8'}views/img/smartsupp_logo.png" alt="Smartsupp" />
+		<nav>
+			<div class="header-user">
+				<span class="header-user__email">
+					{l s='Not a Smartsupp user yet?' mod='smartsupp'}
+				</span>
+				<button id="create_account_btn2" class="btn btn--sm">
+					{l s='Create a free account' mod='smartsupp'}
+				</button>
+			</div>
+		</nav>
+	</header>
+
+	<main class="main" role="main">
+		<div class="main__left">
+			<div class="main-form">
+				<h1 class="main-form__h1">
+					{l s='Log in' mod='smartsupp'}
+				</h1>
+				<div class="form-horizontal">
+					<input id="SMARTSUPP_EMAIL" type="email" value="" name="SMARTSUPP_EMAIL" placeholder="{l s='E-mail:' mod='smartsupp'}" class="input" required>
+					<input id="SMARTSUPP_PASSWORD" type="password" value="" name="SMARTSUPP_PASSWORD" placeholder="{l s='Password:' mod='smartsupp'}" class="input" required>
+					<button id="connect_existing_account_do" class="btn btn--primary btn--arrow btn--all-width">
+						{l s='Log in' mod='smartsupp'}
+					</button>
+                    <p class="main-form__bottom-text">
+						<span>
+							<a href="https://app.smartsupp.com/app/sign/reset" target="_blank" class="link">
+								{l s='I forgot my password' mod='smartsupp'}
+							</a>
+						</span>
+					</p>
+				</div>
+			</div>
 		</div>
-		<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                        <button id="create_account_btn2" class="btn btn-default pull-right">{l s='Create free account' mod='smartsupp'}</button>
+
+		<div class="main__right">
+			<img src="{$module_dir|escape:'html':'UTF-8'}views/img/tablet-screen.png">
 		</div>
-	</div>
-	<hr/>
-        <div class="row">
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4"></div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 text-center">
-                        <p>
-                                <strong class="heading">{l s='Connect existing account' mod='smartsupp'}</strong>
-                        </p>
-                        <p>
-                                <div class="input-group">
-                                    <span class="input-group-addon"> {l s='E-mail' mod='smartsupp'}</span>
-                                    <input id="SMARTSUPP_EMAIL" type="text" size="30" value="" name="SMARTSUPP_EMAIL">
-                                </div>
-                                <br/>
-                                <div class="input-group">
-                                    <span class="input-group-addon"> {l s='Password' mod='smartsupp'} </span>
-                                    <input id="SMARTSUPP_PASSWORD" type="password" size="30" value="" name="SMARTSUPP_PASSWORD">
-                                </div>                                        
-                        </p>
-                        <div class="center-block">
-                                <button id="connect_existing_account_do" class="btn btn-primary btn-lg">{l s='Connect' mod='smartsupp'}</button>
-                        </div>
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4"></div>
-        </div>
-        <br/>
-	<hr/>
-        <div class="row text-center">
-                <p>
-                        <strong class="heading">{l s='Trusted by more that 55 000 companies' mod='smartsupp'}</strong>
-                </p>
-                <div class="customers">
-                        <a>
-                                <img alt="ŠKODA AUTO" src="{$module_dir|escape:'html':'UTF-8'}views/img/skoda.png">
-                        </a>
-                        <a>
-                                <img alt="Gekko Computer" src="{$module_dir|escape:'html':'UTF-8'}views/img/gekko_computer.png">
-                        </a>
-                        <a>
-                                <img alt="Lememo" src="{$module_dir|escape:'html':'UTF-8'}views/img/lememo.png">
-                        </a>
-                        <a>
-                                <img alt="Vinoselección" src="{$module_dir|escape:'html':'UTF-8'}views/img/vinoseleccion.png">
-                        </a>
-                        <a>
-                                <img alt="Conrad" src="{$module_dir|escape:'html':'UTF-8'}views/img/conrad.png">
-                        </a>
-                </div>
-        </div>                
+	</main>
+
+
 </div>

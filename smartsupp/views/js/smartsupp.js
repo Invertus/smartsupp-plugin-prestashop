@@ -20,21 +20,25 @@
 
 jQuery(document).ready( function($) {
     
-    function page_refresh() {
+    function page_refresh(errMsg) {
         var control = $( "#SMARTSUPP_OPTIONAL_API" ).next();
         var text = control.html();
         control.css('font-style', 'normal');
         control.html(text.replace('#', '<a href="https://developers.smartsupp.com/?utm_source=Prestashop&utm_medium=integration&utm_campaign=link" target="_blank">Smartsupp API</a>'));
         
         if ($( "#smartsupp_key" ).val() === "") {
-            $( "#smartsupp_create_account" ).hide();
-            $( "#smartsupp_connect_account" ).hide();
             $( "#smartsupp_configuration" ).hide();
             $( "#configuration_form.smartsupp" ).hide();
-            $( "#smartsupp_landing_page" ).show();
+            
+            if (errMsg === true) {
+                $( "#smartsupp_create_account" ).hide();
+                $( "#smartsupp_connect_account" ).show();
+            } else {
+                $( "#smartsupp_connect_account" ).hide();
+                $( "#smartsupp_create_account" ).show();
+            }
         }
         else {
-            $( "#smartsupp_landing_page" ).hide();
             $( "#smartsupp_create_account" ).hide();
             $( "#smartsupp_connect_account" ).hide();
             $( "#smartsupp_configuration" ).show();
@@ -46,21 +50,21 @@ jQuery(document).ready( function($) {
     
     $( "#connect_existing_account_btn1, #connect_existing_account_btn2" ).click(function() {
         $("#smartsupp_configuration").next('.bootstrap').hide();
-        $("div.smartsupp_landing_page").hide();
-        $( "#smartsupp_landing_page" ).hide();
+        $("div.messages").hide();
         $( "#smartsupp_create_account" ).hide();
         $( "#smartsupp_connect_account" ).show();
     });
     
     $( "#create_account_btn1, #create_account_btn2" ).click(function() {
         $("#smartsupp_configuration").next('.bootstrap').hide();
-        $("div.smartsupp_landing_page").hide();
-        $( "#smartsupp_landing_page" ).hide();
+        $("div.messages").hide();
         $( "#smartsupp_connect_account" ).hide();
         $( "#smartsupp_create_account" ).show();
     });
     
     $( "#connect_existing_account_do" ).click(function() {
+        var errMsg = false;
+
         $.ajax({
                 url: ajax_controller_url,
                 async: false,
@@ -76,49 +80,45 @@ jQuery(document).ready( function($) {
                         $("input#smartsupp_key").val(data.key);
                         $("#smartsupp_configuration p.email").html(data.email);
                         if (data.error === null) {
-                            $("div.smartsupp_landing_page").hide();
+                            $("div.messages").hide();
+                            errMsg = false;
                         }
                         else {
-                            $("div.smartsupp_landing_page").show();
-                            $("div.smartsupp_landing_page span").html(data.message);
+                            $("div.messages").show();
+                            $("div.messages span").html(data.message);
+                            errMsg = true;
                         }
                 }
         });        
-        page_refresh();
+        page_refresh(errMsg);
     });
 
     $( "#create_account_do" ).click(function() {
-        $( "#smartsupp_create_account #SMARTSUPP_DPA_LABEL" ).removeClass("invalid");
-        if ($( "#smartsupp_create_account #SMARTSUPP_DPA" ).is(':checked')) {
-            $.ajax({
-                    url: ajax_controller_url,
-                    async: false,
-                    type: 'POST',
-                    data: {
-                        action: 'create', 
-                        email: $( "#smartsupp_create_account #SMARTSUPP_EMAIL" ).val(), 
-                        password: $( "#smartsupp_create_account #SMARTSUPP_PASSWORD" ).val(),
-                    },
-                    dataType: 'json',
-                    headers: { "cache-control": "no-cache" },
-                    success: function(data) {
-                            $("input#smartsupp_key").val(data.key);
-                            $("#smartsupp_configuration p.email").html(data.email);
-                            if (data.error === null) {
-                                $("div.smartsupp_landing_page").hide();
-                            }
-                            else {
-                                $("div.smartsupp_landing_page").show();
-                                $("div.smartsupp_landing_page span").html(data.message);
-                            }
+        $.ajax({
+            url: ajax_controller_url,
+            async: false,
+            type: 'POST',
+            data: {
+                action: 'create', 
+                email: $( "#smartsupp_create_account #SMARTSUPP_EMAIL" ).val(), 
+                password: $( "#smartsupp_create_account #SMARTSUPP_PASSWORD" ).val(),
+                marketing: $( "#smartsupp_create_account #SMARTSUPP_MKT" ).val()
+            },
+            dataType: 'json',
+            headers: { "cache-control": "no-cache" },
+            success: function(data) {
+                    $("input#smartsupp_key").val(data.key);
+                    $("#smartsupp_configuration p.email").html(data.email);
+                    if (data.error === null) {
+                        $("#smartsupp_create_account .alerts").hide();
                     }
-            });        
-            page_refresh();
-        }
-        else {
-            $( "#smartsupp_create_account #SMARTSUPP_DPA" ).focus();
-            $( "#smartsupp_create_account #SMARTSUPP_DPA_LABEL" ).addClass("invalid");
-        }
+                    else {
+                        $("#smartsupp_create_account .alerts").show();
+                        $("#smartsupp_create_account .alerts .alert").html(data.message);
+                    }
+            }
+        });        
+        page_refresh();    
     });
         
     $( "#deactivate_chat_do" ).click(function() {
@@ -139,5 +139,4 @@ jQuery(document).ready( function($) {
         });
         page_refresh();
     });
-
 });    
