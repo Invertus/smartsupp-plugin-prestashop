@@ -42,7 +42,7 @@ class Smartsupp extends Module
         parent::__construct();
 
         $this->displayName = $this->l('Smartsupp Live Chat');
-        $this->description = $this->l('Engage your customers in a faster and more personal way with Smartsupp Live Chat.');
+        $this->description = $this->l('Smartsupp is your personal shopping assistant. It combines live chat and chatbots to save your time and help you turn visitors into loyal customers. Smartsupp is one of the most popular products in Europe with 50 000 active European webshops and websites.');
         $this->confirmUninstall = $this->l('Are you sure you want to uninstall Smartsupp Live Chat? You will lose all the data related to this module.');
 
         if (version_compare(_PS_VERSION_, '1.5', '<')) {
