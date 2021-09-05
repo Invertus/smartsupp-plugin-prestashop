@@ -83,6 +83,7 @@
 		</div>
 	</main>
 
-                        <p class="heading one">{l s='Visitor screen recording' mod='smartsupp'}</p>
+	{include file='./includes/features.tpl'}
+	{include file='./includes/clients.tpl'}
 
 </div>

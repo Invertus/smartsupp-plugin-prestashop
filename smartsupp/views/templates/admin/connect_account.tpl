@@ -61,5 +61,7 @@
 		</div>
 	</main>
 
+	{include file='./includes/features.tpl'}
+	{include file='./includes/clients.tpl'}
 
 </div>
