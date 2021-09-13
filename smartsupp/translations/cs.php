@@ -3,14 +3,12 @@
 global $_MODULE;
 $_MODULE = array();
 $_MODULE['<{smartsupp}prestashop>smartsupp_b10e4b6a10e84bd7b5312f076d2f3ea7'] = 'Smartsupp Live Chat';
-$_MODULE['<{smartsupp}prestashop>smartsupp_62c23de32bc191f88f77eaef905ca293'] = 'Smartsupp je osobní asistent ve vaší online prodejně. Kombinuje live chat a chatboty, aby vám šetřil čas a pomohl vám změnit návštěvníky ve věrné zákazníky. Smartsupp je s 11 800 aktivními českými e-shopy nejoblíbenějším live chat nástrojem v České republice.';
-$_MODULE['<{smartsupp}prestashop>smartsupp_a20e991223473d0779ade2d16211bed4'] = 'Opravdu chcete odinstalovat Smartsupp? Ztratíte tak všechna data uložená v modulu.';
+$_MODULE['<{smartsupp}prestashop>smartsupp_32c9a2cba97ffc0669ab2c2a139865da'] = 'Smartsupp kombinuje live chat a chatboty, aby vám šetřil čas.';
 $_MODULE['<{smartsupp}prestashop>smartsupp_5db4230515f342afbaee33d685410f04'] = 'Chybí Smartsupp klíč.';
 $_MODULE['<{smartsupp}prestashop>smartsupp_c9cc8cce247e49bae79f15173ce97354'] = 'Uložit';
 $_MODULE['<{smartsupp}prestashop>smartsupp_630f6dc397fe74e52d5189e2c80f282b'] = 'Zpět';
 $_MODULE['<{smartsupp}prestashop>smartsupp_f4f70727dc34561dfde1a3c529b6205c'] = 'Pokročilé nastavení';
 $_MODULE['<{smartsupp}prestashop>smartsupp_6a9187ca4a2a8b1b97b58c1decd1a494'] = 'API (volitelné)';
-$_MODULE['<{smartsupp}prestashop>smartsupp_78a81f0852c850f502d91479f1465761'] = 'Nevkládejte zde chat kód - toto pole je určeno pro (volitelné) pokročilé úpravy pomocí #.';
 $_MODULE['<{smartsupp}prestashop>smartsupp_462390017ab0938911d2d4e964c0cab7'] = 'Nastavení uloženo';
 $_MODULE['<{smartsupp}prestashop>smartsupp_b718adec73e04ce3ec720dd11a06a308'] = 'ID';
 $_MODULE['<{smartsupp}prestashop>smartsupp_49ee3087348e8d44e1feda1917443987'] = 'Jméno';
