@@ -829,6 +829,7 @@ div.smartsupp_landing_page {
 
 #content .panel .btn--primary,
 #content .panel .btn--secondary {
+	text-decoration: none !important;
 	box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16);
 	transition: background-color .2s ease;
 	color: #ffffff;

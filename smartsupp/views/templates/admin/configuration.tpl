@@ -23,7 +23,7 @@
 		<img src="{$module_dir|escape:'html':'UTF-8'}views/img/smartsupp_logo.png" alt="Smartsupp" />
 		<nav>
 			<div class="header-user">
-				<img src="{$module_dir|escape:'html':'UTF-8'}views/img/avatar-grey.png" alt="avatar" />
+				<img class="header-user__avatar" src="{$module_dir|escape:'html':'UTF-8'}views/img/avatar-grey.png" alt="avatar" />
 				<span class="header-user__email">
 					{$smartsupp_email|escape:'htmlall':'UTF-8'}
 				</span>
