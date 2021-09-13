@@ -5,7 +5,7 @@
  * @package   Smartsupp
  * @author    Smartsupp <vladimir@smartsupp.com>
  * @link      http://www.smartsupp.com
- * @copyright 2015 Smartsupp.com
+ * @copyright 2016 Smartsupp.com
  * @license   GPL-2.0+
  *
  * Plugin Name:       Smartsupp Live Chat
