@@ -1,17 +1,17 @@
 <?php
 /**
  * Smartsupp Live Chat integration module.
- * 
- * @package   Smartsupp
+ *
  * @author    Smartsupp <vladimir@smartsupp.com>
- * @link      http://www.smartsupp.com
  * @copyright 2016 Smartsupp.com
  * @license   GPL-2.0+
+ * @package   Smartsupp
+ * @link      http://www.smartsupp.com
  *
  * Plugin Name:       Smartsupp Live Chat
  * Plugin URI:        http://www.smartsupp.com
  * Description:       Adds Smartsupp Live Chat code to PrestaShop.
- * Version:           2.1.8
+ * Version:           2.1.9
  * Author:            Smartsupp
  * Author URI:        http://www.smartsupp.com
  * Text Domain:       smartsupp
@@ -23,16 +23,15 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require __DIR__ . '/vendor/autoload.php';
+require dirname(__FILE__) . '/vendor/autoload.php';
 
 class Smartsupp extends Module
 {
-
     public function __construct()
     {
         $this->name = 'smartsupp';
         $this->tab = 'advertising_marketing';
-        $this->version = '2.1.8';
+        $this->version = '2.1.9';
         $this->author = 'Smartsupp';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
@@ -42,11 +41,15 @@ class Smartsupp extends Module
         parent::__construct();
 
         $this->displayName = $this->l('Smartsupp Live Chat');
-        $this->description = $this->l('Engage your customers in a faster and more personal way with Smartsupp Live Chat.');
-        $this->confirmUninstall = $this->l('Are you sure you want to uninstall Smartsupp Live Chat? You will lose all the data related to this module.');
+        $this->description = $this->l('Smartsupp combines live chat and chatbots to save your time.');
+
+        $confirm = 'Are you sure you want to uninstall Smartsupp Live Chat? ';
+        $confirm .= 'You will lose all the data related to this module.';
+        
+        $this->confirmUninstall = $this->l($confirm);
 
         if (version_compare(_PS_VERSION_, '1.5', '<')) {
-            require(_PS_MODULE_DIR_ . $this->name . '/backward_compatibility/backward.php');
+            include _PS_MODULE_DIR_ . $this->name . '/backward_compatibility/backward.php';
         }
 
         if (!Configuration::get('SMARTSUPP_KEY')) {
@@ -70,7 +73,20 @@ class Smartsupp extends Module
         $tab->id_parent = -1;
         $tab->module = $this->name;
 
-        if (!$tab->add() || !parent::install() || !$this->registerHook('header') || !$this->registerHook('backOfficeHeader') || !Configuration::updateValue('SMARTSUPP_KEY', '') || !Configuration::updateValue('SMARTSUPP_EMAIL', '') || !Configuration::updateValue('SMARTSUPP_CUSTOMER_ID', '1') || !Configuration::updateValue('SMARTSUPP_CUSTOMER_NAME', '1') || !Configuration::updateValue('SMARTSUPP_CUSTOMER_EMAIL', '1') || !Configuration::updateValue('SMARTSUPP_CUSTOMER_PHONE', '1') || !Configuration::updateValue('SMARTSUPP_CUSTOMER_ROLE', '1') || !Configuration::updateValue('SMARTSUPP_CUSTOMER_SPENDINGS', '1') || !Configuration::updateValue('SMARTSUPP_CUSTOMER_ORDERS', '1') || !Configuration::updateValue('SMARTSUPP_OPTIONAL_API', '')
+        if (!$tab->add()
+            || !parent::install()
+            || !$this->registerHook('header')
+            || !$this->registerHook('backOfficeHeader')
+            || !Configuration::updateValue('SMARTSUPP_KEY', '')
+            || !Configuration::updateValue('SMARTSUPP_EMAIL', '')
+            || !Configuration::updateValue('SMARTSUPP_CUSTOMER_ID', '1')
+            || !Configuration::updateValue('SMARTSUPP_CUSTOMER_NAME', '1')
+            || !Configuration::updateValue('SMARTSUPP_CUSTOMER_EMAIL', '1')
+            || !Configuration::updateValue('SMARTSUPP_CUSTOMER_PHONE', '1')
+            || !Configuration::updateValue('SMARTSUPP_CUSTOMER_ROLE', '1')
+            || !Configuration::updateValue('SMARTSUPP_CUSTOMER_SPENDINGS', '1')
+            || !Configuration::updateValue('SMARTSUPP_CUSTOMER_ORDERS', '1')
+            || !Configuration::updateValue('SMARTSUPP_OPTIONAL_API', '')
         ) {
             return false;
         }
@@ -87,7 +103,19 @@ class Smartsupp extends Module
             $tab->delete();
         }
 
-        if (!parent::uninstall() || !$this->unregisterHook('header') || !$this->unregisterHook('backOfficeHeader') || !Configuration::deleteByName('SMARTSUPP_KEY') || !Configuration::deleteByName('SMARTSUPP_EMAIL') || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_ID', '') || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_NAME', '') || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_EMAIL', '') || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_PHONE', '') || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_ROLE', '') || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_SPENDINGS', '') || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_ORDERS', '') || !Configuration::deleteByName('SMARTSUPP_OPTIONAL_API', '')
+        if (!parent::uninstall()
+            || !$this->unregisterHook('header')
+            || !$this->unregisterHook('backOfficeHeader')
+            || !Configuration::deleteByName('SMARTSUPP_KEY')
+            || !Configuration::deleteByName('SMARTSUPP_EMAIL')
+            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_ID', '')
+            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_NAME', '')
+            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_EMAIL', '')
+            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_PHONE', '')
+            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_ROLE', '')
+            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_SPENDINGS', '')
+            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_ORDERS', '')
+            || !Configuration::deleteByName('SMARTSUPP_OPTIONAL_API', '')
         ) {
             return false;
         }
@@ -130,6 +158,10 @@ class Smartsupp extends Module
         );
 
         $fields_form = array();
+
+        $fields_desc = 'Don\'t put the chat code here - this box is for ';
+        $fields_desc .= '(optional) advanced customizations via #.';
+
         $fields_form[0]['form'] = array(
             'legend' => array(
                 'title' => $this->l('Settings')
@@ -139,7 +171,7 @@ class Smartsupp extends Module
                     'type' => 'textarea',
                     'label' => $this->l('Optional API'),
                     'name' => 'SMARTSUPP_OPTIONAL_API',
-                    'desc' => $this->l('Don\'t put the chat code here - this box is for (optional) advanced customizations via #.'),
+                    'desc' => $this->l($fields_desc),
                     'autoload_rte' => false,
                     'rows' => 5
                 )
@@ -170,21 +202,22 @@ class Smartsupp extends Module
         }
 
         $ajax_controller_url = $this->context->link->getAdminLink('AdminSmartsuppAjax');
-        $this->context->smarty->assign(array(
+        $this->context->smarty->assign(
+            array(
             'ajax_controller_url' => $ajax_controller_url,
             'smartsupp_key' => Configuration::get('SMARTSUPP_KEY'),
             'smartsupp_email' => Configuration::get('SMARTSUPP_EMAIL'),
-        ));
+            )
+        );
 
         return $this->display(__FILE__, 'views/templates/admin/landing_page.tpl') .
-                $this->display(__FILE__, 'views/templates/admin/create_account.tpl') .
                 $this->display(__FILE__, 'views/templates/admin/connect_account.tpl') .
                 $this->display(__FILE__, 'views/templates/admin/configuration.tpl') .
                 $output;
     }
 
     /**
-     * @param $smartsupp_key
+     * @param  $smartsupp_key
      * @return string
      * @throws Exception
      */
@@ -194,7 +227,10 @@ class Smartsupp extends Module
             return '';
         }
 
-        // NEVER ever put it into use statement as this will break Presta 1.6 installation - they use eval which does not run PSR autoloader
+        /*
+        NEVER ever put it into use statement as this will break Presta 1.6 installation
+        - they use eval which does not run PSR autoloader
+        */
         $chat = new \Smartsupp\ChatGenerator($smartsupp_key);
         $chat->setPlatform('Prestashop ' . _PS_VERSION_);
         $chat->setCookieDomain('.' . Tools::getHttpHost(false));
@@ -221,7 +257,8 @@ class Smartsupp extends Module
                 $addresses = $this->context->customer->getAddresses($this->context->language->id);
                 if (!empty($addresses[0])) {
                     $first_address = $addresses[0];
-                    $phone = !empty($first_address['phone_mobile']) ? $first_address['phone_mobile'] : $first_address['phone'];
+                    $phone = !empty($first_address['phone_mobile'])
+                        ? $first_address['phone_mobile'] : $first_address['phone'];
                     $chat->setVariable('phone', $this->l('Phone'), $phone);
                 }
             }
@@ -242,7 +279,14 @@ class Smartsupp extends Module
                     }
                 }
                 if (Configuration::get('SMARTSUPP_CUSTOMER_SPENDINGS')) {
-                    $chat->setVariable('spending', $this->l('Spendings'), Tools::displayPrice($spending, $this->context->currency->id));
+                    $chat->setVariable(
+                        'spending',
+                        $this->l('Spendings'),
+                        Tools::displayPrice(
+                            $spending,
+                            $this->context->currency->id
+                        )
+                    );
                 }
                 if (Configuration::get('SMARTSUPP_CUSTOMER_ORDERS')) {
                     $chat->setVariable('orders', $this->l('Orders'), $count);
@@ -250,7 +294,9 @@ class Smartsupp extends Module
             }
         }
 
-        $custom_code = '<script type="text/javascript">' . trim(Configuration::get('SMARTSUPP_OPTIONAL_API')) . '</script>';
+        $custom_code = '<script type="text/javascript">';
+        $custom_code .= trim(Configuration::get('SMARTSUPP_OPTIONAL_API'));
+        $custom_code .= '</script>';
 
         return $chat->render() . $custom_code;
     }
@@ -267,17 +313,18 @@ class Smartsupp extends Module
     {
         $js = '';
         if (strcmp(Tools::getValue('configure'), $this->name) === 0) {
+            $path = $this->_path;
             if (version_compare(_PS_VERSION_, '1.6', '>=') == true) {
-                $this->context->controller->addJquery();                
-                $this->context->controller->addJs($this->_path . 'views/js/smartsupp.js');
-                $this->context->controller->addCSS($this->_path . 'views/css/smartsupp.css');
+                $this->context->controller->addJquery();
+                $this->context->controller->addJs($path . 'views/js/smartsupp.js');
+                $this->context->controller->addCSS($path . 'views/css/smartsupp.css');
                 if (version_compare(_PS_VERSION_, '1.6', '<') == true) {
-                    $this->context->controller->addCSS($this->_path . 'views/css/smartsupp-nobootstrap.css');
+                    $this->context->controller->addCSS($path . 'views/css/smartsupp-nobootstrap.css');
                 }
             } else {
-                $js .= '<script type="text/javascript" src="' . $this->_path . 'views/js/smartsupp.js"></script>';
-                $js .= '<link rel="stylesheet" href="' . $this->_path . 'views/css/smartsupp.css" type="text/css" />' .
-                       '<link rel="stylesheet" href="' . $this->_path . 'views/css/smartsupp-nobootstrap.css" type="text/css" />';
+                $js .= '<script type="text/javascript" src="'.$path.'views/js/smartsupp.js"></script>';
+                $js .= '<link rel="stylesheet" href="'.$path.'views/css/smartsupp.css" type="text/css" />';
+                $js .= '<link rel="stylesheet" href="'.$path.'views/css/smartsupp-nobootstrap.css" type="text/css" />';
             }
         }
 

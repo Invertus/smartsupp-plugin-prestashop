@@ -1,17 +1,17 @@
 <?php
 /**
  * Smartsupp Live Chat integration module.
- * 
- * @package   Smartsupp
+ *
  * @author    Smartsupp <vladimir@smartsupp.com>
- * @link      http://www.smartsupp.com
  * @copyright 2016 Smartsupp.com
  * @license   GPL-2.0+
+ * @package   Smartsupp
+ * @link      http://www.smartsupp.com
  *
  * Plugin Name:       Smartsupp Live Chat
  * Plugin URI:        http://www.smartsupp.com
  * Description:       Adds Smartsupp Live Chat code to PrestaShop.
- * Version:           2.1.8
+ * Version:           2.1.9
  * Text Domain:       smartsupp
  * Author:            Smartsupp
  * Author URI:        http://www.smartsupp.com
