@@ -11,7 +11,7 @@
  * Plugin Name:       Smartsupp Live Chat
  * Plugin URI:        http://www.smartsupp.com
  * Description:       Adds Smartsupp Live Chat code to PrestaShop.
- * Version:           2.1.9
+ * Version:           2.2.0
  * Author:            Smartsupp
  * Author URI:        http://www.smartsupp.com
  * Text Domain:       smartsupp
@@ -31,7 +31,7 @@ class Smartsupp extends Module
     {
         $this->name = 'smartsupp';
         $this->tab = 'advertising_marketing';
-        $this->version = '2.1.9';
+        $this->version = '2.2.0';
         $this->author = 'Smartsupp';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
@@ -45,7 +45,7 @@ class Smartsupp extends Module
 
         $confirm = 'Are you sure you want to uninstall Smartsupp Live Chat? ';
         $confirm .= 'You will lose all the data related to this module.';
-        
+
         $this->confirmUninstall = $this->l($confirm);
 
         if (version_compare(_PS_VERSION_, '1.5', '<')) {

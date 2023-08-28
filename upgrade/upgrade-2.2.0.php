@@ -11,7 +11,7 @@
  * Plugin Name:       Smartsupp Live Chat
  * Plugin URI:        http://www.smartsupp.com
  * Description:       Adds Smartsupp Live Chat code to PrestaShop.
- * Version:           2.1.9
+ * Version:           2.2.0
  * Text Domain:       smartsupp
  * Author:            Smartsupp
  * Author URI:        http://www.smartsupp.com
@@ -26,7 +26,7 @@ use Smartsupp\LiveChat\Utility\VersionUtility;
  *
  * @return bool
  */
-function upgrade_module_3_0_0($module)
+function upgrade_module_2_2_0($module)
 {
     if (VersionUtility::isPsVersionGreaterThan('1.6')) {
         $module->registerHook('displayBackOfficeHeader');
