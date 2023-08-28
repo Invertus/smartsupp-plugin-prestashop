@@ -39,6 +39,9 @@
 				<h1 class="main-form__h1">
 					{l s='Log in' mod='smartsupp'}
 				</h1>
+				<div id="smartsupp-login-alerts" class="alerts">
+					<div id="smartsupp-login-alert" class="alert alert-danger js-clear"></div>
+				</div>
 				<div class="form-horizontal">
 					<input id="SMARTSUPP_EMAIL" type="email" value="" name="SMARTSUPP_EMAIL" placeholder="{l s='E-mail:' mod='smartsupp'}" class="input" required>
 					<input id="SMARTSUPP_PASSWORD" type="password" value="" name="SMARTSUPP_PASSWORD" placeholder="{l s='Password:' mod='smartsupp'}" class="input" required>

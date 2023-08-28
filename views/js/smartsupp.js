@@ -84,8 +84,8 @@ jQuery(document).ready( function($) {
                             errMsg = false;
                         }
                         else {
-                            $("div.messages").show();
-                            $("div.messages span").html(data.message);
+                            $("#smartsupp-login-alerts").show();
+                            $("#smartsupp-login-alert").html(data.message);
                             errMsg = true;
                         }
                 }
@@ -107,7 +107,7 @@ jQuery(document).ready( function($) {
             dataType: 'json',
             headers: { "cache-control": "no-cache" },
             success: function(data) {
-                    $("input#smartsupp_key").val(data.key);
+                $("input#smartsupp_key").val(data.key);
                     $("#smartsupp_configuration p.email").html(data.email);
                     if (data.error === null) {
                         $("#smartsupp_create_account .alerts").hide();

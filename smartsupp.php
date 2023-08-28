@@ -19,11 +19,11 @@
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  */
 
+use Smartsupp\LiveChat\Utility\VersionUtility;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
-
-require dirname(__FILE__) . '/vendor/autoload.php';
 
 class Smartsupp extends Module
 {
@@ -52,6 +52,8 @@ class Smartsupp extends Module
             include _PS_MODULE_DIR_ . $this->name . '/backward_compatibility/backward.php';
         }
 
+        $this->autoload();
+
         if (!Configuration::get('SMARTSUPP_KEY')) {
             $this->warning = $this->l('No Smartsupp key provided.');
         }
@@ -73,10 +75,15 @@ class Smartsupp extends Module
         $tab->id_parent = -1;
         $tab->module = $this->name;
 
+        if (VersionUtility::isPsVersionGreaterThan('1.6')) {
+            $this->registerHook('displayBackOfficeHeader');
+        } else {
+            $this->registerHook('backOfficeHeader');
+        }
+
         if (!$tab->add()
             || !parent::install()
             || !$this->registerHook('header')
-            || !$this->registerHook('backOfficeHeader')
             || !Configuration::updateValue('SMARTSUPP_KEY', '')
             || !Configuration::updateValue('SMARTSUPP_EMAIL', '')
             || !Configuration::updateValue('SMARTSUPP_CUSTOMER_ID', '1')
@@ -91,21 +98,36 @@ class Smartsupp extends Module
             return false;
         }
 
+        if (VersionUtility::isPsVersionGreaterThan('1.6')) {
+            $this->registerHook('displayBackOfficeHeader');
+        } else {
+            $this->registerHook('backOfficeHeader');
+        }
+
         return true;
     }
 
     public function uninstall()
     {
-        $id_tab = (int) Tab::getIdFromClassName('AdminSmartsuppAjax');
+        if (VersionUtility::isPsVersionGreaterOrEqualTo('1.7.1')) {
+            $id_tab = $this->get('prestashop.core.admin.tab.repository')->findOneIdByClassName('AdminSmartsuppAjax');
+        } else {
+            $id_tab = (int) Tab::getIdFromClassName('AdminSmartsuppAjax');
+        }
 
         if ($id_tab) {
             $tab = new Tab($id_tab);
             $tab->delete();
         }
 
+        if (VersionUtility::isPsVersionGreaterThan('1.6')) {
+            $this->unregisterHook('displayBackOfficeHeader');
+        } else {
+            $this->unregisterHook('backOfficeHeader');
+        }
+
         if (!parent::uninstall()
             || !$this->unregisterHook('header')
-            || !$this->unregisterHook('backOfficeHeader')
             || !Configuration::deleteByName('SMARTSUPP_KEY')
             || !Configuration::deleteByName('SMARTSUPP_EMAIL')
             || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_ID', '')
@@ -312,20 +334,27 @@ class Smartsupp extends Module
     public function hookBackOfficeHeader()
     {
         $js = '';
+
         if (strcmp(Tools::getValue('configure'), $this->name) === 0) {
             $path = $this->_path;
-            if (version_compare(_PS_VERSION_, '1.6', '>=') == true) {
-                $this->context->controller->addJquery();
-                $this->context->controller->addJs($path . 'views/js/smartsupp.js');
-                $this->context->controller->addCSS($path . 'views/css/smartsupp.css');
-                if (version_compare(_PS_VERSION_, '1.6', '<') == true) {
-                    $this->context->controller->addCSS($path . 'views/css/smartsupp-nobootstrap.css');
-                }
-            } else {
-                $js .= '<script type="text/javascript" src="'.$path.'views/js/smartsupp.js"></script>';
-                $js .= '<link rel="stylesheet" href="'.$path.'views/css/smartsupp.css" type="text/css" />';
-                $js .= '<link rel="stylesheet" href="'.$path.'views/css/smartsupp-nobootstrap.css" type="text/css" />';
-            }
+            $js .= '<script type="text/javascript" src="' . $path . 'views/js/smartsupp.js"></script>';
+            $js .= '<link rel="stylesheet" href="' . $path . 'views/css/smartsupp.css" type="text/css" />';
+            $js .= '<link rel="stylesheet" href="' . $path . 'views/css/smartsupp-nobootstrap.css" type="text/css" />';
+        }
+
+        return $js;
+    }
+
+    public function hookDisplayBackOfficeHeader()
+    {
+        $js = '';
+
+        if (strcmp(Tools::getValue('configure'), $this->name) === 0) {
+            $path = $this->_path;
+            $this->context->controller->addJquery();
+            $this->context->controller->addJs($path . 'views/js/smartsupp.js');
+            $this->context->controller->addCSS($path . 'views/css/smartsupp.css');
+            $this->context->controller->addCSS($path . 'views/css/smartsupp-nobootstrap.css');
         }
 
         return $js;
@@ -334,5 +363,10 @@ class Smartsupp extends Module
     protected function getAdminDir()
     {
         return basename(_PS_ADMIN_DIR_);
+    }
+
+    private function autoload()
+    {
+        include_once "{$this->getLocalPath()}vendor/autoload.php";
     }
 }

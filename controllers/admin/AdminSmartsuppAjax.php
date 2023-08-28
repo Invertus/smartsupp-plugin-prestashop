@@ -32,26 +32,36 @@ class AdminSmartsuppAjaxController extends ModuleAdminController
                 
         switch (Tools::getValue('action')) {
             case 'login':
-                $response = $api->login(array(
+                $response = $api->login([
                     'email' => Tools::getValue('email'),
                     'password' => Tools::getValue('password'),
                     'platform' => 'Prestashop ' . _PS_VERSION_,
-                ));
+                ]);
 
-                Configuration::updateValue('SMARTSUPP_KEY', $response['account']['key']);
-                Configuration::updateValue('SMARTSUPP_EMAIL', Tools::getValue('email'));
+                if (!isset($response['account']['key'])) {
+                    $response['error'] = isset($response['error']) ? $response['error'] : $this->module->l('Unknown Error Occurred');
+                    $response['message'] = isset($response['message']) ? $response['message'] : $this->module->l('Unknown Error Occurred');
+                } else {
+                    Configuration::updateValue('SMARTSUPP_KEY', $response['account']['key']);
+                    Configuration::updateValue('SMARTSUPP_EMAIL', Tools::getValue('email'));
+                }
                 break;
             case 'create':
-                $response = $api->create(array(
+                $response = $api->create([
                     'email' => Tools::getValue('email'),
                     'password' => Tools::getValue('password'),
                     'partnerKey' => $this->partnerKey,
                     'consentTerms' => 1,
                     'platform' => 'Prestashop ' . _PS_VERSION_,
-                ));
+                ]);
 
-                Configuration::updateValue('SMARTSUPP_KEY', $response['account']['key']);
-                Configuration::updateValue('SMARTSUPP_EMAIL', Tools::getValue('email'));
+                if (!isset($response['account']['key'])) {
+                    $response['error'] = isset($response['error']) ? $response['error'] : $this->module->l('Unknown Error Occurred');
+                    $response['message'] = isset($response['message']) ? $response['message'] : $this->module->l('Unknown Error Occurred');
+                } else {
+                    Configuration::updateValue('SMARTSUPP_KEY', $response['account']['key']);
+                    Configuration::updateValue('SMARTSUPP_EMAIL', Tools::getValue('email'));
+                }
                 break;
             case 'deactivate':
                 Configuration::updateValue('SMARTSUPP_KEY', '');
@@ -65,12 +75,24 @@ class AdminSmartsuppAjaxController extends ModuleAdminController
         }
 
         header('Content-Type: application/json');
-        die(Tools::jsonEncode(array(
-                    'key' => Configuration::get('SMARTSUPP_KEY'),
-                    'email' => Configuration::get('SMARTSUPP_EMAIL'),
-                    'error' => $response['error'],
-                    'message' => $response['message'],
-                    'hint' => $response['hint']
-                )));
+
+        $responseData = [
+            'key' => Configuration::get('SMARTSUPP_KEY'),
+            'email' => Configuration::get('SMARTSUPP_EMAIL'),
+        ];
+
+        if (isset($response['error'])) {
+            $responseData['error'] = $response['error'];
+        }
+
+        if (isset($response['message'])) {
+            $responseData['message'] = $response['message'];
+        }
+
+        if (isset($response['hint'])) {
+            $responseData['hint'] = $response['hint'];
+        }
+
+        die(json_encode($responseData));
     }
 }
