@@ -56,11 +56,6 @@ class AdminSmartsuppAjaxController extends ModuleAdminController
                 Configuration::updateValue('SMARTSUPP_EMAIL', '');
                 break;
         }
-                
-        if (isset($this->response) && isset($this->response['error'])) {
-            Configuration::updateValue('SMARTSUPP_KEY', '');
-            Configuration::updateValue('SMARTSUPP_EMAIL', '');
-        }
 
         header('Content-Type: application/json');
 
@@ -93,5 +88,8 @@ class AdminSmartsuppAjaxController extends ModuleAdminController
 
         $this->response['error'] = isset($this->response['error']) ? $this->response['error'] : $this->module->l('Unknown Error Occurred', self::FILE_NAME);
         $this->response['message'] = isset($this->response['message']) ? $this->response['message'] : $this->module->l('Unknown Error Occurred', self::FILE_NAME);
+
+        Configuration::updateValue('SMARTSUPP_KEY', '');
+        Configuration::updateValue('SMARTSUPP_EMAIL', '');
     }
 }
