@@ -23,8 +23,10 @@ use \Smartsupp\Auth\Api;
 
 class AdminSmartsuppAjaxController extends ModuleAdminController
 {
+    const FILE_NAME = 'AdminSmartsuppAjaxController';
     public $ssl = true;
     private $partnerKey = 'h4w6t8hln9';
+    private $response = [];
 
     public function init()
     {
@@ -32,36 +34,22 @@ class AdminSmartsuppAjaxController extends ModuleAdminController
                 
         switch (Tools::getValue('action')) {
             case 'login':
-                $response = $api->login([
+                $this->response = $api->login([
                     'email' => Tools::getValue('email'),
                     'password' => Tools::getValue('password'),
                     'platform' => 'Prestashop ' . _PS_VERSION_,
                 ]);
-
-                if (!isset($response['account']['key'])) {
-                    $response['error'] = isset($response['error']) ? $response['error'] : $this->module->l('Unknown Error Occurred');
-                    $response['message'] = isset($response['message']) ? $response['message'] : $this->module->l('Unknown Error Occurred');
-                } else {
-                    Configuration::updateValue('SMARTSUPP_KEY', $response['account']['key']);
-                    Configuration::updateValue('SMARTSUPP_EMAIL', Tools::getValue('email'));
-                }
+                $this->updateCredentials();
                 break;
             case 'create':
-                $response = $api->create([
+                $this->response = $api->create([
                     'email' => Tools::getValue('email'),
                     'password' => Tools::getValue('password'),
                     'partnerKey' => $this->partnerKey,
                     'consentTerms' => 1,
                     'platform' => 'Prestashop ' . _PS_VERSION_,
                 ]);
-
-                if (!isset($response['account']['key'])) {
-                    $response['error'] = isset($response['error']) ? $response['error'] : $this->module->l('Unknown Error Occurred');
-                    $response['message'] = isset($response['message']) ? $response['message'] : $this->module->l('Unknown Error Occurred');
-                } else {
-                    Configuration::updateValue('SMARTSUPP_KEY', $response['account']['key']);
-                    Configuration::updateValue('SMARTSUPP_EMAIL', Tools::getValue('email'));
-                }
+                $this->updateCredentials();
                 break;
             case 'deactivate':
                 Configuration::updateValue('SMARTSUPP_KEY', '');
@@ -69,7 +57,7 @@ class AdminSmartsuppAjaxController extends ModuleAdminController
                 break;
         }
                 
-        if (isset($response) && isset($response['error'])) {
+        if (isset($this->response) && isset($this->response['error'])) {
             Configuration::updateValue('SMARTSUPP_KEY', '');
             Configuration::updateValue('SMARTSUPP_EMAIL', '');
         }
@@ -79,20 +67,31 @@ class AdminSmartsuppAjaxController extends ModuleAdminController
         $responseData = [
             'key' => Configuration::get('SMARTSUPP_KEY'),
             'email' => Configuration::get('SMARTSUPP_EMAIL'),
+            'error' => isset($this->response['error']) ? $this->response['error'] : null,
+            'message' => isset($this->response['message']) ? $this->response['message'] : null,
         ];
 
-        if (isset($response['error'])) {
-            $responseData['error'] = $response['error'];
-        }
-
-        if (isset($response['message'])) {
-            $responseData['message'] = $response['message'];
-        }
-
-        if (isset($response['hint'])) {
-            $responseData['hint'] = $response['hint'];
-        }
+        $responseData = array_filter($responseData, function ($val) {
+            return $val !== null;
+        });
 
         die(json_encode($responseData));
+    }
+
+
+    /**
+     * @return void
+     */
+    private function updateCredentials()
+    {
+        if (isset($this->response['account']['key'])) {
+            Configuration::updateValue('SMARTSUPP_KEY', $this->response['account']['key']);
+            Configuration::updateValue('SMARTSUPP_EMAIL', Tools::getValue('email'));
+
+            return;
+        }
+
+        $this->response['error'] = isset($this->response['error']) ? $this->response['error'] : $this->module->l('Unknown Error Occurred', self::FILE_NAME);
+        $this->response['message'] = isset($this->response['message']) ? $this->response['message'] : $this->module->l('Unknown Error Occurred', self::FILE_NAME);
     }
 }
