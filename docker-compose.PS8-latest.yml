@@ -11,12 +11,12 @@ services:
       - prestashop_network
   prestashop:
     container_name: prestashop
-    image: prestashop/prestashop:1.7-7.2 # Latest stable version of the PrestaShop, to see all available images go to ...
+    image: prestashop/prestashop:latest # Latest stable version of the PrestaShop, to see all available images go to ...
     restart: unless-stopped
     depends_on:
       - mysql
     ports:
-      - 2222:80
+      - 3333:80
     environment:
       PS_INSTALL_AUTO: 1
       PS_FOLDER_ADMIN: admin1
@@ -24,7 +24,7 @@ services:
       DB_NAME: prestashop
       DB_USER: root
       DB_PASSWD: admin
-      PS_DOMAIN: localhost:2222
+      PS_DOMAIN: localhost:3333
 
     networks:
       - prestashop_network
