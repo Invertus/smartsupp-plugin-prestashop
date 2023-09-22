@@ -2,11 +2,14 @@
 
 global $_MODULE;
 $_MODULE = array();
-$_MODULE['<{smartsupp}prestashop>smartsupp_b10e4b6a10e84bd7b5312f076d2f3ea7'] = 'Smartsupp Live Chat';
-$_MODULE['<{smartsupp}prestashop>smartsupp_32c9a2cba97ffc0669ab2c2a139865da'] = 'Smartsupp kombinuje live chat a chatboty, aby vám šetřil čas.';
+$_MODULE['<{smartsupp}prestashop>smartsupp_b82eb30ace208db211486bdb42475ee5'] = 'Smartsupp je váš osobní online nákupní asistent, vytvořený pro zvýšení míry konverze a prodeje prostřednictvím zapojení návštěvníků v reálném čase a ve správný čas.';
+$_MODULE['<{smartsupp}prestashop>smartsupp_b62af1ad4918b402f148fc2e7841677f'] = 'Opravdu chcete odinstalovat Smartsupp Live Chat?';
+$_MODULE['<{smartsupp}prestashop>smartsupp_4f1adf15fc9b2682736ce1c6749c2175'] = 'Ztratíte všechna data související s tímto modulem.';
 $_MODULE['<{smartsupp}prestashop>smartsupp_5db4230515f342afbaee33d685410f04'] = 'Chybí Smartsupp klíč.';
 $_MODULE['<{smartsupp}prestashop>smartsupp_c9cc8cce247e49bae79f15173ce97354'] = 'Uložit';
 $_MODULE['<{smartsupp}prestashop>smartsupp_630f6dc397fe74e52d5189e2c80f282b'] = 'Zpět';
+$_MODULE['<{smartsupp}prestashop>smartsupp_5b4b55bc08ab8887708ec6188b33f238'] = 'Neuvádějte zde kód chatu – toto pole je pro';
+$_MODULE['<{smartsupp}prestashop>smartsupp_aacbc2c9886e5520a4714cec4c72f1d4'] = '(volitelně) pokročilé přizpůsobení prostřednictvím ';
 $_MODULE['<{smartsupp}prestashop>smartsupp_f4f70727dc34561dfde1a3c529b6205c'] = 'Pokročilé nastavení';
 $_MODULE['<{smartsupp}prestashop>smartsupp_6a9187ca4a2a8b1b97b58c1decd1a494'] = 'API (volitelné)';
 $_MODULE['<{smartsupp}prestashop>smartsupp_462390017ab0938911d2d4e964c0cab7'] = 'Nastavení uloženo';
@@ -28,12 +31,6 @@ $_MODULE['<{smartsupp}prestashop>landing_page_ca1efe2bfa38190699e573ea733c821c']
 $_MODULE['<{smartsupp}prestashop>landing_page_6f1bf85c9ebb3c7fa26251e1e335e032'] = 'podmínkami';
 $_MODULE['<{smartsupp}prestashop>landing_page_be5d5d37542d75f93a87094459f76678'] = 'a';
 $_MODULE['<{smartsupp}prestashop>landing_page_a50a1efe5421320d2dc8ba27e1f7463d'] = 'DPA';
-$_MODULE['<{smartsupp}prestashop>connect_account_3dc3748ee6772a392b583c399cb96fe5'] = 'Nemáte účet?';
-$_MODULE['<{smartsupp}prestashop>connect_account_8ea211024d4a6ad6119a33549dae10d6'] = 'Založit účet zdarma';
-$_MODULE['<{smartsupp}prestashop>connect_account_bffe9a3c9a7e00ba00a11749e022d911'] = 'Přihlásit se';
-$_MODULE['<{smartsupp}prestashop>connect_account_df1555fe48479f594280a2e03f9a8186'] = 'E-mail:';
-$_MODULE['<{smartsupp}prestashop>connect_account_b341a59d5636ed3d6a819137495b08a0'] = 'Heslo:';
-$_MODULE['<{smartsupp}prestashop>connect_account_b05d72142020283dc6812fd3a9bc691c'] = 'Zapomněl/a jsem heslo';
 $_MODULE['<{smartsupp}prestashop>configuration_9f0e8ccbad931f6a5970bcf9d80482c3'] = 'Deaktivovat chat';
 $_MODULE['<{smartsupp}prestashop>configuration_bfc719af6420fa1d34b6f3cc858d3494'] = 'Všechno je nastavené a funkční';
 $_MODULE['<{smartsupp}prestashop>configuration_ca546d2931eac2cb8f292a583aa2e3fa'] = 'Gratulujeme! Smartsupp live chat je teď nasazený na vaší stránce.';
@@ -41,6 +38,12 @@ $_MODULE['<{smartsupp}prestashop>configuration_866e05fd4e69717004f77431d4f4254b'
 $_MODULE['<{smartsupp}prestashop>configuration_e81c4e4f2b7b93b481e13a8553c2ae1b'] = 'nebo nejprve';
 $_MODULE['<{smartsupp}prestashop>configuration_b191593bc602ff910417b3f85bb496ca'] = 'nastavte';
 $_MODULE['<{smartsupp}prestashop>configuration_b0c2b3626fad53c9cdd6cdd9d3251e90'] = 'vzhled chat boxu';
+$_MODULE['<{smartsupp}prestashop>connect_account_3dc3748ee6772a392b583c399cb96fe5'] = 'Nemáte účet?';
+$_MODULE['<{smartsupp}prestashop>connect_account_8ea211024d4a6ad6119a33549dae10d6'] = 'Založit účet zdarma';
+$_MODULE['<{smartsupp}prestashop>connect_account_bffe9a3c9a7e00ba00a11749e022d911'] = 'Přihlásit se';
+$_MODULE['<{smartsupp}prestashop>connect_account_df1555fe48479f594280a2e03f9a8186'] = 'E-mail:';
+$_MODULE['<{smartsupp}prestashop>connect_account_b341a59d5636ed3d6a819137495b08a0'] = 'Heslo:';
+$_MODULE['<{smartsupp}prestashop>connect_account_b05d72142020283dc6812fd3a9bc691c'] = 'Zapomněl/a jsem heslo';
 $_MODULE['<{smartsupp}prestashop>clients_9f07b115f358391fc5118f1488f69965'] = 'NEJOBLÍBENĚJŠÍ CHAT ĆESKÝCH WEBŮ A ESHOPŮ';
 $_MODULE['<{smartsupp}prestashop>clients_79733ba6c329916522a8369f2b94ac99'] = 'Přidejte se k více než 500 000 společnostem a živnostníkům spoléhajícím na Smartsupp po celém světě';
 $_MODULE['<{smartsupp}prestashop>features_9e9a9f11d422e372100a4c07df22f849'] = 'MULTICHANNEL';

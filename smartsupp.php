@@ -40,11 +40,11 @@ class Smartsupp extends Module
 
         parent::__construct();
 
-        $this->displayName = $this->l('Smartsupp Live Chat');
-        $this->description = $this->l('Smartsupp combines live chat and chatbots to save your time.');
+        $this->displayName = $this->l('Smartsupp Live Chat & AI Chatbots');
+        $this->description = $this->l('Smartsupp is your personal online shopping assistant, built to increase conversion rates and sales via visitor engagement in real-time, at the right time.');
 
-        $confirm = 'Are you sure you want to uninstall Smartsupp Live Chat? ';
-        $confirm .= 'You will lose all the data related to this module.';
+        $confirm = $this->l('Are you sure you want to uninstall Smartsupp Live Chat? ');
+        $confirm .= $this->l('You will lose all the data related to this module.');
 
         $this->confirmUninstall = $this->l($confirm);
 
@@ -181,8 +181,8 @@ class Smartsupp extends Module
 
         $fields_form = array();
 
-        $fields_desc = 'Don\'t put the chat code here - this box is for ';
-        $fields_desc .= '(optional) advanced customizations via #.';
+        $fields_desc = $this->l('Don\'t put the chat code here - this box is for ');
+        $fields_desc .= $this->l('(optional) advanced customizations via ') . '#.';
 
         $fields_form[0]['form'] = array(
             'legend' => array(
