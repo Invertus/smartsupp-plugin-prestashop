@@ -64,7 +64,6 @@ class AdminSmartsuppAjaxController extends ModuleAdminController
             }
         } catch (Exception $e) {
             $this->handleError($e->getMessage());
-            throw $e;
         }
 
         $this->sendResponse();
@@ -119,8 +118,14 @@ class AdminSmartsuppAjaxController extends ModuleAdminController
 
     private function handleError($message, $error = 'error')
     {
+        $this->response['key'] = Configuration::get('SMARTSUPP_KEY');
+        $this->response['email'] = Configuration::get('SMARTSUPP_EMAIL');
+
         $this->response['error'] = $error;
         $this->response['message'] = $message;
+
+        die(json_encode($this->response));
+
     }
 
     private function sendResponse()
