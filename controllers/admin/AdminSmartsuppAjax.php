@@ -2,61 +2,129 @@
 /**
  * Smartsupp Live Chat integration module.
  *
+ * @package   Smartsupp
  * @author    Smartsupp <vladimir@smartsupp.com>
+ * @link      http://www.smartsupp.com
  * @copyright 2016 Smartsupp.com
  * @license   GPL-2.0+
- * @package   Smartsupp
- * @link      http://www.smartsupp.com
  *
  * Plugin Name:       Smartsupp Live Chat
  * Plugin URI:        http://www.smartsupp.com
  * Description:       Adds Smartsupp Live Chat code to PrestaShop.
  * Version:           2.2.0
- * Text Domain:       smartsupp
  * Author:            Smartsupp
  * Author URI:        http://www.smartsupp.com
+ * Text Domain:       smartsupp
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  */
 
-use \Smartsupp\Auth\Api;
+use Smartsupp\Auth\Api;
+use Smartsupp\LiveChat\Validator\UserCredentialsValidator;
 
 class AdminSmartsuppAjaxController extends ModuleAdminController
 {
     const FILE_NAME = 'AdminSmartsuppAjaxController';
-    public $ssl = true;
+
     private $partnerKey = 'h4w6t8hln9';
-    private $response = [];
+    private $api;
+
+    const LOGIN_ACTION = 'login';
+    const CREATE_ACTION = 'create';
+    const DEACTIVATE_ACTION = 'deactivate';
 
     public function init()
     {
-        $api = new Api();
-                
-        switch (Tools::getValue('action')) {
-            case 'login':
-                $this->response = $api->login([
-                    'email' => Tools::getValue('email'),
-                    'password' => Tools::getValue('password'),
-                    'platform' => 'Prestashop ' . _PS_VERSION_,
-                ]);
-                $this->updateCredentials();
-                break;
-            case 'create':
-                $this->response = $api->create([
-                    'email' => Tools::getValue('email'),
-                    'password' => Tools::getValue('password'),
-                    'partnerKey' => $this->partnerKey,
-                    'consentTerms' => 1,
-                    'platform' => 'Prestashop ' . _PS_VERSION_,
-                ]);
-                $this->updateCredentials();
-                break;
-            case 'deactivate':
-                Configuration::updateValue('SMARTSUPP_KEY', '');
-                Configuration::updateValue('SMARTSUPP_EMAIL', '');
-                break;
+        $validator = new UserCredentialsValidator($this->module);
+
+        $validator->validate(Tools::getAllValues());
+        $action = Tools::getValue('action');
+
+        if ($validator->getError() && $action !== self::DEACTIVATE_ACTION) {
+            $this->handleError($validator->getMessage(), $validator->getError());
+            $this->sendResponse();
         }
 
+
+        try {
+            $this->api = new Api();
+
+            switch ($action) {
+                case self::LOGIN_ACTION:
+                    $this->handleLoginAction();
+                    break;
+                case self::CREATE_ACTION:
+                    $this->handleCreateAction();
+                    break;
+                case self::DEACTIVATE_ACTION:
+                    $this->handleDeactivateAction();
+                    break;
+                default:
+                    throw new Exception('Invalid action');
+            }
+        } catch (Exception $e) {
+            $this->handleError($e->getMessage());
+            throw $e;
+        }
+
+        $this->sendResponse();
+    }
+
+    private function handleLoginAction()
+    {
+        $this->response = $this->api->login([
+            'email' => Tools::getValue('email'),
+            'password' => Tools::getValue('password'),
+            'platform' => 'Prestashop ' . _PS_VERSION_,
+        ]);
+
+        $this->updateCredentials();
+    }
+
+    private function handleCreateAction()
+    {
+        $this->response = $this->api->create([
+            'email' => Tools::getValue('email'),
+            'password' => Tools::getValue('password'),
+            'partnerKey' => $this->partnerKey,
+            'consentTerms' => 1,
+            'platform' => 'Prestashop ' . _PS_VERSION_,
+        ]);
+
+        $this->updateCredentials();
+    }
+
+    private function handleDeactivateAction()
+    {
+        Configuration::updateValue('SMARTSUPP_KEY', '');
+        Configuration::updateValue('SMARTSUPP_EMAIL', '');
+
+        $this->sendResponse();
+    }
+
+    private function updateCredentials()
+    {
+        if (isset($this->response['account']['key'])) {
+            Configuration::updateValue('SMARTSUPP_KEY', $this->response['account']['key']);
+            Configuration::updateValue('SMARTSUPP_EMAIL', Tools::getValue('email'));
+            return;
+        }
+
+        if (isset($this->response['error'])) {
+            $this->sendResponse();
+        }
+
+        $this->handleError($this->module->l('Unknown Error Occurred', self::FILE_NAME));
+    }
+
+    private function handleError($message, $error = 'error')
+    {
+        $this->response['error'] = $error;
+        $this->response['message'] = $message;
+    }
+
+    private function sendResponse()
+    {
         header('Content-Type: application/json');
 
         $responseData = [
@@ -71,25 +139,5 @@ class AdminSmartsuppAjaxController extends ModuleAdminController
         });
 
         die(json_encode($responseData));
-    }
-
-
-    /**
-     * @return void
-     */
-    private function updateCredentials()
-    {
-        if (isset($this->response['account']['key'])) {
-            Configuration::updateValue('SMARTSUPP_KEY', $this->response['account']['key']);
-            Configuration::updateValue('SMARTSUPP_EMAIL', Tools::getValue('email'));
-
-            return;
-        }
-
-        $this->response['error'] = isset($this->response['error']) ? $this->response['error'] : $this->module->l('Unknown Error Occurred', self::FILE_NAME);
-        $this->response['message'] = isset($this->response['message']) ? $this->response['message'] : $this->module->l('Unknown Error Occurred', self::FILE_NAME);
-
-        Configuration::updateValue('SMARTSUPP_KEY', '');
-        Configuration::updateValue('SMARTSUPP_EMAIL', '');
     }
 }
