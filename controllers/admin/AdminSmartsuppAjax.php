@@ -42,9 +42,7 @@ class AdminSmartsuppAjaxController extends ModuleAdminController
 
         if ($validator->getError() && $action !== self::DEACTIVATE_ACTION) {
             $this->handleError($validator->getMessage(), $validator->getError());
-            $this->sendResponse();
         }
-
 
         try {
             $this->api = new Api();
@@ -113,7 +111,7 @@ class AdminSmartsuppAjaxController extends ModuleAdminController
             $this->sendResponse();
         }
 
-        $this->handleError($this->module->l('Unknown Error Occurred', self::FILE_NAME));
+        $this->handleError($this->module->l('Unknown error occurred while processing your request.', self::FILE_NAME));
     }
 
     private function handleError($message, $error = 'error')
