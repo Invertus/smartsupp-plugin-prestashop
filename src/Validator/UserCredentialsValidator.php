@@ -71,7 +71,7 @@ class UserCredentialsValidator
 
         // Validate password
         if (!$this->validatePassword($password)) {
-            $this->error = $this->module->l('Password length is incorrect', self::FILE_NAME);
+            $this->error = $this->module->l('Password length is invalid', self::FILE_NAME);
             $this->message = $this->module->l('Password must be between 6-255 characters long', self::FILE_NAME);
         }
     }
