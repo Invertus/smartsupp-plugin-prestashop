@@ -23,7 +23,7 @@ namespace Smartsupp\LiveChat\Validator;
 
 class UserCredentialsValidator
 {
-    const FILE_NAME = 'LoginActionValidator';
+    const FILE_NAME = 'UserCredentialsValidator';
 
     /**
      * @var \Smartsupp $module
@@ -45,6 +45,11 @@ class UserCredentialsValidator
         $this->module = $module;
     }
 
+    /**
+     * @param array $data
+     *
+     * @return void
+     */
     public function validate($data)
     {
         $email = isset($data['email']) ? $data['email'] : '';
@@ -71,11 +76,17 @@ class UserCredentialsValidator
         }
     }
 
+    /**
+     * @return string
+     */
     public function getError()
     {
         return $this->error;
     }
 
+    /**
+     * @return string
+     */
     public function getMessage()
     {
         return $this->message;

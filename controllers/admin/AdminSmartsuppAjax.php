@@ -125,7 +125,6 @@ class AdminSmartsuppAjaxController extends ModuleAdminController
         $this->response['message'] = $message;
 
         die(json_encode($this->response));
-
     }
 
     private function sendResponse()
