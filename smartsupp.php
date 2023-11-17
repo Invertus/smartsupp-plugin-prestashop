@@ -43,10 +43,7 @@ class Smartsupp extends Module
         $this->displayName = $this->l('Smartsupp Live Chat & AI Chatbots');
         $this->description = $this->l('Smartsupp is your personal online shopping assistant, built to increase conversion rates and sales via visitor engagement in real-time, at the right time.');
 
-        $confirm = $this->l('Are you sure you want to uninstall Smartsupp Live Chat? ');
-        $confirm .= $this->l('You will lose all the data related to this module.');
-
-        $this->confirmUninstall = $this->l($confirm);
+        $this->confirmUninstall = $this->l('Are you sure you want to uninstall Smartsupp Live Chat? You will lose all the data related to this module.');
 
         if (version_compare(_PS_VERSION_, '1.5', '<')) {
             include _PS_MODULE_DIR_ . $this->name . '/backward_compatibility/backward.php';
