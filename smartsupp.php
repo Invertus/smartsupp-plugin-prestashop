@@ -347,6 +347,12 @@ class Smartsupp extends Module
         $js = '';
 
         if (strcmp(Tools::getValue('configure'), $this->name) === 0) {
+            \Media::addJsDef([
+                'smartsupp' => [
+                    'genericAjaxErrorMessage' => $this->l('Unknown error occurred. Please contact support.'),
+                ],
+            ]);
+
             $path = $this->_path;
             $this->context->controller->addJquery();
             $this->context->controller->addJs($path . 'views/js/smartsupp.js');
