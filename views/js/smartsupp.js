@@ -78,7 +78,6 @@ jQuery(document).ready( function($) {
             dataType: 'json',
             headers: { "cache-control": "no-cache" },
             success: function (response) {
-                console.log(response)
                 if (response.error) {
                     $("#smartsupp-login-alerts").show();
 
