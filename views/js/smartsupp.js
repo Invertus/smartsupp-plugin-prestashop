@@ -130,12 +130,13 @@ jQuery(document).ready( function($) {
 
                     if (response.message) {
                         $("#smartsupp_create_account .alerts .alert").html(response.message);
+                    } else {
+                        $("#smartsupp_create_account .alerts .alert").html(smartsupp.genericAjaxErrorMessage);
                     }
-
-                    return;
                 }
 
-                $("#smartsupp_create_account .alerts .alert").html(smartsupp.genericAjaxErrorMessage);
+                $("input#smartsupp_key").val(response.key);
+                $("#smartsupp_configuration p.email").html(response.email);
             },
             error: function (response) {
                 console.error(response);
