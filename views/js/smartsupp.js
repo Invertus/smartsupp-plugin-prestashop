@@ -165,14 +165,16 @@ jQuery(document).ready( function($) {
             success: function (response) {
                 $("input#smartsupp_key").val(response.key);
                 $("#smartsupp_configuration p.email").html(response.email);
+                page_refresh();
             },
             error: function (response) {
                 console.error(response);
 
                 // Since there is no error container in the template, alerting for now
                 alert(smartsupp.genericAjaxErrorMessage);
+
+                return;
             }
         });
-        page_refresh();
     });
 });    
