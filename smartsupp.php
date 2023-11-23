@@ -333,6 +333,12 @@ class Smartsupp extends Module
         $js = '';
 
         if (strcmp(Tools::getValue('configure'), $this->name) === 0) {
+            \Media::addJsDef([
+                'smartsupp' => [
+                    'genericAjaxErrorMessage' => $this->l('Unknown error occurred. Try again or contact support.'),
+                ],
+            ]);
+
             $path = $this->_path;
             $js .= '<script type="text/javascript" src="' . $path . 'views/js/smartsupp.js"></script>';
             $js .= '<link rel="stylesheet" href="' . $path . 'views/css/smartsupp.css" type="text/css" />';
@@ -347,6 +353,12 @@ class Smartsupp extends Module
         $js = '';
 
         if (strcmp(Tools::getValue('configure'), $this->name) === 0) {
+            \Media::addJsDef([
+                'smartsupp' => [
+                    'genericAjaxErrorMessage' => $this->l('Unknown error occurred. Try again or contact support.'),
+                ],
+            ]);
+
             $path = $this->_path;
             $this->context->controller->addJquery();
             $this->context->controller->addJs($path . 'views/js/smartsupp.js');
