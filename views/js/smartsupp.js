@@ -63,37 +63,55 @@ jQuery(document).ready( function($) {
     });
     
     $( "#connect_existing_account_do" ).click(function() {
+        $("#smartsupp-login-alerts").hide();
         var errMsg = false;
 
         $.ajax({
-                url: ajax_controller_url,
-                async: false,
-                type: 'POST',
-                data: {
-                    action: 'login', 
-                    email: $( "#smartsupp_connect_account #SMARTSUPP_EMAIL" ).val(), 
-                    password: $( "#smartsupp_connect_account #SMARTSUPP_PASSWORD" ).val()
-                },
-                dataType: 'json',
-                headers: { "cache-control": "no-cache" },
-                success: function(data) {
-                        $("input#smartsupp_key").val(data.key);
-                        $("#smartsupp_configuration p.email").html(data.email);
-                        if (data.error === null) {
-                            $("div.messages").hide();
-                            errMsg = false;
-                        }
-                        else {
-                            $("#smartsupp-login-alerts").show();
-                            $("#smartsupp-login-alert").html(data.message);
-                            errMsg = true;
-                        }
+            url: ajax_controller_url,
+            async: false,
+            type: 'POST',
+            data: {
+                action: 'login',
+                email: $( "#smartsupp_connect_account #SMARTSUPP_EMAIL" ).val(),
+                password: $( "#smartsupp_connect_account #SMARTSUPP_PASSWORD" ).val()
+            },
+            dataType: 'json',
+            headers: { "cache-control": "no-cache" },
+            success: function (response) {
+                if (response.error) {
+                    $("#smartsupp-login-alerts").show();
+
+                    if (response.message) {
+                        $("#smartsupp-login-alert").html(response.message);
+                    } else {
+                        $("#smartsupp-login-alert").html(smartsupp.genericAjaxErrorMessage);
+                    }
+                    errMsg = true;
+
+                    return;
                 }
+
+                $("input#smartsupp_key").val(response.key);
+                $("#smartsupp_configuration p.email").html(response.email);
+                $("div.messages").hide();
+                errMsg = false;
+            },
+            error: function (response) {
+                console.error(response);
+                errMsg = true;
+
+                if (smartsupp.genericAjaxErrorMessage) {
+                    $("#smartsupp-login-alerts").show();
+                    $("#smartsupp-login-alert").html(smartsupp.genericAjaxErrorMessage);
+                }
+            }
         });        
         page_refresh(errMsg);
     });
 
     $( "#create_account_do" ).click(function() {
+        $("#smartsupp_create_account .alerts").hide();
+
         $.ajax({
             url: ajax_controller_url,
             async: false,
@@ -106,16 +124,27 @@ jQuery(document).ready( function($) {
             },
             dataType: 'json',
             headers: { "cache-control": "no-cache" },
-            success: function(data) {
-                $("input#smartsupp_key").val(data.key);
-                    $("#smartsupp_configuration p.email").html(data.email);
-                    if (data.error === null) {
-                        $("#smartsupp_create_account .alerts").hide();
+            success: function (response) {
+                if (response.error) {
+                    $("#smartsupp_create_account .alerts").show();
+
+                    if (response.message) {
+                        $("#smartsupp_create_account .alerts .alert").html(response.message);
+                    } else {
+                        $("#smartsupp_create_account .alerts .alert").html(smartsupp.genericAjaxErrorMessage);
                     }
-                    else {
-                        $("#smartsupp_create_account .alerts").show();
-                        $("#smartsupp_create_account .alerts .alert").html(data.message);
-                    }
+                }
+
+                $("input#smartsupp_key").val(response.key);
+                $("#smartsupp_configuration p.email").html(response.email);
+            },
+            error: function (response) {
+                console.error(response);
+
+                if (smartsupp.genericAjaxErrorMessage) {
+                    $("#smartsupp_create_account .alerts").show();
+                    $("#smartsupp_create_account .alerts .alert").html(smartsupp.genericAjaxErrorMessage);
+                }
             }
         });        
         page_refresh();    
@@ -123,20 +152,29 @@ jQuery(document).ready( function($) {
         
     $( "#deactivate_chat_do" ).click(function() {
         $("#smartsupp_configuration").next('.bootstrap').hide();
+
         $.ajax({
-                url: ajax_controller_url,
-                async: false,
-                type: 'POST',
-                data: {
-                    action: 'deactivate'
-                },
-                dataType: 'json',
-                headers: { "cache-control": "no-cache" },
-                success: function(data) {
-                        $("input#smartsupp_key").val(data.key);
-                        $("#smartsupp_configuration p.email").html(data.email);
-                }
+            url: ajax_controller_url,
+            async: false,
+            type: 'POST',
+            data: {
+                action: 'deactivate'
+            },
+            dataType: 'json',
+            headers: { "cache-control": "no-cache" },
+            success: function (response) {
+                $("input#smartsupp_key").val(response.key);
+                $("#smartsupp_configuration p.email").html(response.email);
+                page_refresh();
+            },
+            error: function (response) {
+                console.error(response);
+
+                // Since there is no error container in the template, alerting for now
+                alert(smartsupp.genericAjaxErrorMessage);
+
+                return;
+            }
         });
-        page_refresh();
     });
 });    
