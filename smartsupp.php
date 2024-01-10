@@ -357,8 +357,10 @@ class Smartsupp extends Module
                 'smartsupp' => [
                     'genericAjaxErrorMessage' => $this->l('Unknown error occurred. Try again or contact support.'),
                     'translations' => [
-                        'advancedSettingsDescriptionAnchorTag' => $this->l('Smartsupp API')],
+                        'advancedSettingsDescriptionAnchorTag' => $this->l('Smartsupp API')
                     ],
+                    'mainPageUrl' => $this->l('https://www.smartsupp.com/')
+                ],
             ]);
 
             $path = $this->_path;

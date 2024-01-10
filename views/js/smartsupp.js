@@ -24,8 +24,7 @@ jQuery(document).ready( function($) {
         var control = $( "#SMARTSUPP_OPTIONAL_API" ).next();
         var text = control.html();
         control.css('font-style', 'normal');
-        control.html(text.replace('#', '<a href="https://www.smartsupp.com" target="_blank">' + smartsupp.translations.advancedSettingsDescriptionAnchorTag + '</a>'));
-        
+        control.html(text.replace('#', '<a href="' + smartsupp.mainPageUrl + '" target="_blank">' + smartsupp.translations.advancedSettingsDescriptionAnchorTag + '</a>'));
         if ($( "#smartsupp_key" ).val() === "") {
             $( "#smartsupp_configuration" ).hide();
             $( "#configuration_form.smartsupp" ).hide();
