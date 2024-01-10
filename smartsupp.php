@@ -356,7 +356,9 @@ class Smartsupp extends Module
             \Media::addJsDef([
                 'smartsupp' => [
                     'genericAjaxErrorMessage' => $this->l('Unknown error occurred. Try again or contact support.'),
-                ],
+                    'translations' => [
+                        'advancedSettingsDescriptionAnchorTag' => $this->l('Smartsupp API')],
+                    ],
             ]);
 
             $path = $this->_path;

@@ -24,7 +24,7 @@ jQuery(document).ready( function($) {
         var control = $( "#SMARTSUPP_OPTIONAL_API" ).next();
         var text = control.html();
         control.css('font-style', 'normal');
-        control.html(text.replace('#', '<a href="https://developers.smartsupp.com/?utm_source=Prestashop&utm_medium=integration&utm_campaign=link" target="_blank">Smartsupp API</a>'));
+        control.html(text.replace('#', '<a href="https://www.smartsupp.com" target="_blank">' + smartsupp.translations.advancedSettingsDescriptionAnchorTag + '</a>'));
         
         if ($( "#smartsupp_key" ).val() === "") {
             $( "#smartsupp_configuration" ).hide();
