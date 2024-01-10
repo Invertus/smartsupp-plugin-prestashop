@@ -31,7 +31,7 @@ class Smartsupp extends Module
     {
         $this->name = 'smartsupp';
         $this->tab = 'advertising_marketing';
-        $this->version = '2.2.1';
+        $this->version = '2.2.2';
         $this->author = 'Smartsupp';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
