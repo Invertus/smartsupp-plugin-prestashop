@@ -72,15 +72,18 @@ class Smartsupp extends Module
         $tab->id_parent = -1;
         $tab->module = $this->name;
 
+        $backOfficeHookSuccess = false;
+
         if (VersionUtility::isPsVersionGreaterThan('1.6')) {
-            $this->registerHook('displayBackOfficeHeader');
+            $backOfficeHookSuccess = $this->registerHook('displayAdminHeader');
         } else {
-            $this->registerHook('backOfficeHeader');
+            $backOfficeHookSuccess = $this->registerHook('backOfficeHeader');
         }
 
         if (!$tab->add()
             || !parent::install()
-            || !$this->registerHook('header')
+            || !$this->registerHook('displayHeader')
+            || !$backOfficeHookSuccess
             || !Configuration::updateValue('SMARTSUPP_KEY', '')
             || !Configuration::updateValue('SMARTSUPP_EMAIL', '')
             || !Configuration::updateValue('SMARTSUPP_CUSTOMER_ID', '1')
@@ -93,12 +96,6 @@ class Smartsupp extends Module
             || !Configuration::updateValue('SMARTSUPP_OPTIONAL_API', '')
         ) {
             return false;
-        }
-
-        if (VersionUtility::isPsVersionGreaterThan('1.6')) {
-            $this->registerHook('displayBackOfficeHeader');
-        } else {
-            $this->registerHook('backOfficeHeader');
         }
 
         return true;
@@ -118,13 +115,13 @@ class Smartsupp extends Module
         }
 
         if (VersionUtility::isPsVersionGreaterThan('1.6')) {
-            $this->unregisterHook('displayBackOfficeHeader');
+            $this->unregisterHook('displayAdminHeader');
         } else {
             $this->unregisterHook('backOfficeHeader');
         }
 
         if (!parent::uninstall()
-            || !$this->unregisterHook('header')
+            || !$this->unregisterHook('displayHeader')
             || !Configuration::deleteByName('SMARTSUPP_KEY')
             || !Configuration::deleteByName('SMARTSUPP_EMAIL')
             || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_ID', '')
@@ -320,7 +317,7 @@ class Smartsupp extends Module
         return $chat->render() . $custom_code;
     }
 
-    public function hookHeader()
+    public function hookDisplayHeader()
     {
         $smartsupp_key = Configuration::get('SMARTSUPP_KEY');
         $this->smarty->assign(array('smartsupp_js' => $this->getSmartsuppJs($smartsupp_key)));
@@ -348,7 +345,7 @@ class Smartsupp extends Module
         return $js;
     }
 
-    public function hookDisplayBackOfficeHeader()
+    public function hookDisplayAdminHeader()
     {
         $js = '';
 
