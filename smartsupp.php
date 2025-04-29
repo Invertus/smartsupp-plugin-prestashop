@@ -75,7 +75,7 @@ class Smartsupp extends Module
         $backOfficeHookSuccess = false;
 
         if (VersionUtility::isPsVersionGreaterThan('1.6')) {
-            $backOfficeHookSuccess = $this->registerHook('displayAdminHeader');
+            $backOfficeHookSuccess = $this->registerHook('displayBackOfficeHeader');
         } else {
             $backOfficeHookSuccess = $this->registerHook('backOfficeHeader');
         }
@@ -115,7 +115,7 @@ class Smartsupp extends Module
         }
 
         if (VersionUtility::isPsVersionGreaterThan('1.6')) {
-            $this->unregisterHook('displayAdminHeader');
+            $this->unregisterHook('displayBackOfficeHeader');
         } else {
             $this->unregisterHook('backOfficeHeader');
         }
@@ -345,7 +345,7 @@ class Smartsupp extends Module
         return $js;
     }
 
-    public function hookDisplayAdminHeader()
+    public function hookDisplayBackOfficeHeader()
     {
         $js = '';
 
