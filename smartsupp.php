@@ -233,17 +233,20 @@ class Smartsupp extends Module
 
     public function getContent()
     {
-        $mboInstaller = new Prestashop\ModuleLibMboInstaller\DependencyBuilder($this);
         $psDependencies = '';
 
-        if (!$mboInstaller->areDependenciesMet()) {
-            $dependencies = $mboInstaller->handleDependencies();
-            $this->context->smarty->assign('dependencies', $dependencies);
-
-            $psDependencies = $this->context->smarty->fetch($this->getLocalPath() . 'views/templates/admin/dependency_builder.tpl');
-        }
-
         try {
+            if (VersionUtility::isPsVersionGreaterOrEqualTo('1.7.0')) {
+                $mboInstaller = new Prestashop\ModuleLibMboInstaller\DependencyBuilder($this);
+
+                if (!$mboInstaller->areDependenciesMet()) {
+                    $dependencies = $mboInstaller->handleDependencies();
+                    $this->context->smarty->assign('dependencies', $dependencies);
+
+                    $psDependencies = $this->context->smarty->fetch($this->getLocalPath() . 'views/templates/admin/dependency_builder.tpl');
+                }
+            }
+
             $this->loadPsAccounts();
             $this->loadCloudSync();
 
