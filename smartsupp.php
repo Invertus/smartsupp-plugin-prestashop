@@ -72,43 +72,60 @@ class Smartsupp extends Module
 
     public function install()
     {
+        // Must succeed before proceeding
+        if (!parent::install()) {
+            return false;
+        }
+
         if (version_compare(_PS_VERSION_, '1.6', '>=') && Shop::isFeatureActive()) {
             Shop::setContext(Shop::CONTEXT_ALL);
         }
 
+        // Register appropriate hook
+        $hookRegistered = version_compare(_PS_VERSION_, '1.6', '>=')
+            ? $this->registerHook('displayBackOfficeHeader')
+            : $this->registerHook('backOfficeHeader');
+
+        if (!$hookRegistered || !$this->registerHook('displayHeader')) {
+            return false;
+        }
+
+        // Create Tab
         $tab = new Tab();
         $tab->active = 1;
         $tab->class_name = 'AdminSmartsuppAjax';
-        $tab->name = array();
+        $tab->name = [];
+
         foreach (Language::getLanguages(true) as $lang) {
             $tab->name[$lang['id_lang']] = 'Smartsupp';
         }
+
         $tab->id_parent = -1;
         $tab->module = $this->name;
 
-        if (VersionUtility::isPsVersionGreaterOrEqualTo('1.6')) {
-            $this->registerHook('displayBackOfficeHeader');
-        } else {
-            $this->registerHook('backOfficeHeader');
+        if (!$tab->add()) {
+            return false;
         }
 
-        parent::install();
+        // Configuration values to be stored
+        $configValues = [
+            'SMARTSUPP_KEY'                => '',
+            'SMARTSUPP_EMAIL'              => '',
+            'SMARTSUPP_CUSTOMER_ID'        => '1',
+            'SMARTSUPP_CUSTOMER_NAME'      => '1',
+            'SMARTSUPP_CUSTOMER_EMAIL'     => '1',
+            'SMARTSUPP_CUSTOMER_PHONE'     => '1',
+            'SMARTSUPP_CUSTOMER_ROLE'      => '1',
+            'SMARTSUPP_CUSTOMER_SPENDINGS' => '1',
+            'SMARTSUPP_CUSTOMER_ORDERS'    => '1',
+            'SMARTSUPP_OPTIONAL_API'       => '',
+        ];
 
-        $tab->add();
-
-        Configuration::updateValue('SMARTSUPP_KEY', '');
-        Configuration::updateValue('SMARTSUPP_EMAIL', '');
-        Configuration::updateValue('SMARTSUPP_CUSTOMER_ID', '1');
-        Configuration::updateValue('SMARTSUPP_CUSTOMER_NAME', '1');
-        Configuration::updateValue('SMARTSUPP_CUSTOMER_EMAIL', '1');
-        Configuration::updateValue('SMARTSUPP_CUSTOMER_PHONE', '1');
-        Configuration::updateValue('SMARTSUPP_CUSTOMER_ROLE', '1');
-        Configuration::updateValue('SMARTSUPP_CUSTOMER_SPENDINGS', '1');
-        Configuration::updateValue('SMARTSUPP_CUSTOMER_ORDERS', '1');
-        Configuration::updateValue('SMARTSUPP_OPTIONAL_API', '');
-
-        $this->registerHook('displayHeader');
-        $this->registerHook('displayBackOfficeHeader');
+        foreach ($configValues as $key => $value) {
+            if (!Configuration::updateValue($key, $value)) {
+                return false;
+            }
+        }
 
         return true;
     }
@@ -223,7 +240,7 @@ class Smartsupp extends Module
             $dependencies = $mboInstaller->handleDependencies();
             $this->context->smarty->assign('dependencies', $dependencies);
 
-            return $this->context->smarty->fetch($this->getLocalPath() . 'views/templates/admin/dependency_builder.tpl');
+            $psDependencies = $this->context->smarty->fetch($this->getLocalPath() . 'views/templates/admin/dependency_builder.tpl');
         }
 
         try {
@@ -234,9 +251,8 @@ class Smartsupp extends Module
             $psDependencies .= $this->context->smarty->fetch($this->getLocalPath() . '/views/templates/admin/cloudsync.tpl');
 
         } catch (\Exception $exception) {
-            $this->errors[] = $this->l('Unable to load your PrestaShop accounts details. Please contact support.', 'SmartsUpp');
+            $this->errors[] = $this->l('Unable to load your PrestaShop accounts details.', 'SmartsUpp');
             \PrestaShopLogger::addLog($exception->getMessage(), 3, null, 'SmartsUpp', null, true);
-            return $psDependencies;
         }
 
         $output = '';
