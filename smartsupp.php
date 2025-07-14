@@ -19,22 +19,38 @@
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  */
 
+use PrestaShop\Module\PsEventbus\Service\PresenterService;
+use PrestaShop\PsAccountsInstaller\Installer\Facade\PsAccounts;
 use Smartsupp\LiveChat\Utility\VersionUtility;
 
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+if (file_exists(__DIR__ . '/vendor/autoload.php')) {
+    require_once __DIR__ . '/vendor/autoload.php';
+}
+
 class Smartsupp extends Module
 {
+    const PRESTASHOP_CLOUDSYNC_CDC = 'https://assets.prestashop3.com/ext/cloudsync-merchant-sync-consent/latest/cloudsync-cdc.js';
+
+    /**
+     * @var PrestaShop\ModuleLibServiceContainer\DependencyInjection\ServiceContainer
+     */
+    private $serviceContainer;
+
     public function __construct()
     {
+        // Parameter for cloudsync consent component
+        $this->useLightMode = true;
+
         $this->name = 'smartsupp';
         $this->tab = 'advertising_marketing';
-        $this->version = '2.2.3';
+        $this->version = '2.2.4';
         $this->author = 'Smartsupp';
         $this->need_instance = 0;
-        $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+        $this->ps_versions_compliancy = ['min' => '1.6', 'max' => _PS_VERSION_];
         $this->bootstrap = true;
         $this->module_key = 'da5110815a9ea717be24a57b804d24fb';
 
@@ -48,8 +64,6 @@ class Smartsupp extends Module
         if (version_compare(_PS_VERSION_, '1.5', '<')) {
             include _PS_MODULE_DIR_ . $this->name . '/backward_compatibility/backward.php';
         }
-
-        $this->autoload();
 
         if (!Configuration::get('SMARTSUPP_KEY')) {
             $this->warning = $this->l('No Smartsupp key provided.');
@@ -72,31 +86,29 @@ class Smartsupp extends Module
         $tab->id_parent = -1;
         $tab->module = $this->name;
 
-        $backOfficeHookSuccess = false;
-
-        if (VersionUtility::isPsVersionGreaterThan('1.6')) {
-            $backOfficeHookSuccess = $this->registerHook('displayBackOfficeHeader');
+        if (VersionUtility::isPsVersionGreaterOrEqualTo('1.6')) {
+            $this->registerHook('displayBackOfficeHeader');
         } else {
-            $backOfficeHookSuccess = $this->registerHook('backOfficeHeader');
+            $this->registerHook('backOfficeHeader');
         }
 
-        if (!$tab->add()
-            || !parent::install()
-            || !$this->registerHook('displayHeader')
-            || !$backOfficeHookSuccess
-            || !Configuration::updateValue('SMARTSUPP_KEY', '')
-            || !Configuration::updateValue('SMARTSUPP_EMAIL', '')
-            || !Configuration::updateValue('SMARTSUPP_CUSTOMER_ID', '1')
-            || !Configuration::updateValue('SMARTSUPP_CUSTOMER_NAME', '1')
-            || !Configuration::updateValue('SMARTSUPP_CUSTOMER_EMAIL', '1')
-            || !Configuration::updateValue('SMARTSUPP_CUSTOMER_PHONE', '1')
-            || !Configuration::updateValue('SMARTSUPP_CUSTOMER_ROLE', '1')
-            || !Configuration::updateValue('SMARTSUPP_CUSTOMER_SPENDINGS', '1')
-            || !Configuration::updateValue('SMARTSUPP_CUSTOMER_ORDERS', '1')
-            || !Configuration::updateValue('SMARTSUPP_OPTIONAL_API', '')
-        ) {
-            return false;
-        }
+        parent::install();
+
+        $tab->add();
+
+        Configuration::updateValue('SMARTSUPP_KEY', '');
+        Configuration::updateValue('SMARTSUPP_EMAIL', '');
+        Configuration::updateValue('SMARTSUPP_CUSTOMER_ID', '1');
+        Configuration::updateValue('SMARTSUPP_CUSTOMER_NAME', '1');
+        Configuration::updateValue('SMARTSUPP_CUSTOMER_EMAIL', '1');
+        Configuration::updateValue('SMARTSUPP_CUSTOMER_PHONE', '1');
+        Configuration::updateValue('SMARTSUPP_CUSTOMER_ROLE', '1');
+        Configuration::updateValue('SMARTSUPP_CUSTOMER_SPENDINGS', '1');
+        Configuration::updateValue('SMARTSUPP_CUSTOMER_ORDERS', '1');
+        Configuration::updateValue('SMARTSUPP_OPTIONAL_API', '');
+
+        $this->registerHook('displayHeader');
+        $this->registerHook('displayBackOfficeHeader');
 
         return true;
     }
@@ -114,7 +126,7 @@ class Smartsupp extends Module
             $tab->delete();
         }
 
-        if (VersionUtility::isPsVersionGreaterThan('1.6')) {
+        if (VersionUtility::isPsVersionGreaterOrEqualTo('1.6')) {
             $this->unregisterHook('displayBackOfficeHeader');
         } else {
             $this->unregisterHook('backOfficeHeader');
@@ -204,6 +216,29 @@ class Smartsupp extends Module
 
     public function getContent()
     {
+        $mboInstaller = new Prestashop\ModuleLibMboInstaller\DependencyBuilder($this);
+        $psDependencies = '';
+
+        if (!$mboInstaller->areDependenciesMet()) {
+            $dependencies = $mboInstaller->handleDependencies();
+            $this->context->smarty->assign('dependencies', $dependencies);
+
+            return $this->context->smarty->fetch($this->getLocalPath() . 'views/templates/admin/dependency_builder.tpl');
+        }
+
+        try {
+            $this->loadPsAccounts();
+            $this->loadCloudSync();
+
+            $psDependencies .= $this->context->smarty->fetch($this->getLocalPath() . 'views/templates/admin/ps_accounts.tpl');
+            $psDependencies .= $this->context->smarty->fetch($this->getLocalPath() . '/views/templates/admin/cloudsync.tpl');
+
+        } catch (\Exception $exception) {
+            $this->errors[] = $this->l('Unable to load your PrestaShop accounts details. Please contact support.', 'SmartsUpp');
+            \PrestaShopLogger::addLog($exception->getMessage(), 3, null, 'SmartsUpp', null, true);
+            return $psDependencies;
+        }
+
         $output = '';
         if (Tools::isSubmit('submit' . $this->name)) {
             $smartsupp_key = Configuration::get('SMARTSUPP_KEY');
@@ -226,7 +261,8 @@ class Smartsupp extends Module
             )
         );
 
-        return $this->display(__FILE__, 'views/templates/admin/landing_page.tpl') .
+        return $psDependencies .
+                $this->display(__FILE__, 'views/templates/admin/landing_page.tpl') .
                 $this->display(__FILE__, 'views/templates/admin/connect_account.tpl') .
                 $this->display(__FILE__, 'views/templates/admin/configuration.tpl') .
                 $output;
@@ -357,7 +393,11 @@ class Smartsupp extends Module
             ]);
 
             $path = $this->_path;
-            $this->context->controller->addJquery();
+
+            if (!VersionUtility::isPsVersionGreaterOrEqualTo('9.0.0')) {
+                $this->context->controller->addJquery();
+            }
+
             $this->context->controller->addJs($path . 'views/js/smartsupp.js');
             $this->context->controller->addCSS($path . 'views/css/smartsupp.css');
             $this->context->controller->addCSS($path . 'views/css/smartsupp-nobootstrap.css');
@@ -366,13 +406,88 @@ class Smartsupp extends Module
         return $js;
     }
 
-    protected function getAdminDir()
+    /**
+     * @return string
+     *
+     * @throws \PrestaShop\PsAccountsInstaller\Installer\Exception\ModuleNotInstalledException
+     * @throws \PrestaShop\PsAccountsInstaller\Installer\Exception\ModuleVersionException
+     */
+    private function loadPsAccounts()
     {
-        return basename(_PS_ADMIN_DIR_);
+        /** @var PsAccounts $accountsFacade */
+        $accountsFacade = $this->getService(PsAccounts::class);
+
+        $psAccountsPresenter = $accountsFacade->getPsAccountsPresenter();
+        $psAccountsService = $accountsFacade->getPsAccountsService();
+
+        $existing = $this->context->smarty->getTemplateVars('smartsupp') ?? [];
+
+        $this->context->smarty->assign('smartsupp', array_merge_recursive($existing, [
+            'url' => [
+                'psAccountsCdnUrl' => $psAccountsService->getAccountsCdn(),
+            ],
+        ]));
+
+        $previousJsDef = isset(\Media::getJsDef()['smartsupp']) ? \Media::getJsDef()['smartsupp'] : [];
+
+        \Media::addJsDef([
+            'contextPsAccounts' => $psAccountsPresenter->present(),
+            'smartsupp' => array_merge($previousJsDef, [
+                'isPsAccountsLinked' => $psAccountsService->isAccountLinked(),
+            ]),
+        ]);
     }
 
-    private function autoload()
+    /**
+     * @return void
+     *
+     * @throws PrestaShopException
+     */
+    private function loadCloudSync()
     {
-        include_once "{$this->getLocalPath()}vendor/autoload.php";
+        $eventbusModule = \Module::getInstanceByName('ps_eventbus');
+
+        if (!$eventbusModule) {
+            \PrestaShopLogger::addLog('Module ps_eventbus not found', 3, null, 'SmartsUpp', null, true);
+            return;
+        }
+
+        /** @var PresenterService $eventbusPresenterService */
+        $eventbusPresenterService = $eventbusModule->getService(PresenterService::class);
+
+        $existing = $this->context->smarty->getTemplateVars('smartsupp') ?? [];
+
+        $this->context->smarty->assign('smartsupp', array_merge_recursive($existing, [
+            'url' => [
+                'cloudSyncPathCDC' => self::PRESTASHOP_CLOUDSYNC_CDC,
+            ],
+        ]));
+        $previousJsDef = isset(\Media::getJsDef()['smartsupp']) ? \Media::getJsDef()['smartsupp'] : [];
+
+        \Media::addJsDef([
+            'contextPsEventbus' => $eventbusPresenterService->expose($this, ['info']),
+            'smartsupp' => array_merge($previousJsDef, [
+                'url' => [
+                    'cloudSyncPathCDC' => self::PRESTASHOP_CLOUDSYNC_CDC,
+                ],
+            ]),
+        ]);
+    }
+
+    /**
+     * @param string $serviceName
+     *
+     * @return mixed
+     */
+    public function getService($serviceName)
+    {
+        if ($this->serviceContainer === null) {
+            $this->serviceContainer = new \PrestaShop\ModuleLibServiceContainer\DependencyInjection\ServiceContainer(
+                $this->name . str_replace(['.', '-', '+'], '', $this->version),
+                $this->getLocalPath()
+            );
+        }
+
+        return $this->serviceContainer->getService($serviceName);
     }
 }
