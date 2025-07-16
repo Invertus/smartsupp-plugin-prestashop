@@ -11,7 +11,7 @@
  * Plugin Name:       Smartsupp Live Chat
  * Plugin URI:        http://www.smartsupp.com
  * Description:       Adds Smartsupp Live Chat code to PrestaShop.
- * Version:           2.2.0
+ * Version:           2.2.3
  * Author:            Smartsupp
  * Author URI:        http://www.smartsupp.com
  * Text Domain:       smartsupp
@@ -31,7 +31,7 @@ class Smartsupp extends Module
     {
         $this->name = 'smartsupp';
         $this->tab = 'advertising_marketing';
-        $this->version = '2.2.2';
+        $this->version = '2.2.3';
         $this->author = 'Smartsupp';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
@@ -72,15 +72,18 @@ class Smartsupp extends Module
         $tab->id_parent = -1;
         $tab->module = $this->name;
 
+        $backOfficeHookSuccess = false;
+
         if (VersionUtility::isPsVersionGreaterThan('1.6')) {
-            $this->registerHook('displayBackOfficeHeader');
+            $backOfficeHookSuccess = $this->registerHook('displayBackOfficeHeader');
         } else {
-            $this->registerHook('backOfficeHeader');
+            $backOfficeHookSuccess = $this->registerHook('backOfficeHeader');
         }
 
         if (!$tab->add()
             || !parent::install()
-            || !$this->registerHook('header')
+            || !$this->registerHook('displayHeader')
+            || !$backOfficeHookSuccess
             || !Configuration::updateValue('SMARTSUPP_KEY', '')
             || !Configuration::updateValue('SMARTSUPP_EMAIL', '')
             || !Configuration::updateValue('SMARTSUPP_CUSTOMER_ID', '1')
@@ -93,12 +96,6 @@ class Smartsupp extends Module
             || !Configuration::updateValue('SMARTSUPP_OPTIONAL_API', '')
         ) {
             return false;
-        }
-
-        if (VersionUtility::isPsVersionGreaterThan('1.6')) {
-            $this->registerHook('displayBackOfficeHeader');
-        } else {
-            $this->registerHook('backOfficeHeader');
         }
 
         return true;
@@ -124,7 +121,7 @@ class Smartsupp extends Module
         }
 
         if (!parent::uninstall()
-            || !$this->unregisterHook('header')
+            || !$this->unregisterHook('displayHeader')
             || !Configuration::deleteByName('SMARTSUPP_KEY')
             || !Configuration::deleteByName('SMARTSUPP_EMAIL')
             || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_ID', '')
@@ -320,7 +317,7 @@ class Smartsupp extends Module
         return $chat->render() . $custom_code;
     }
 
-    public function hookHeader()
+    public function hookDisplayHeader()
     {
         $smartsupp_key = Configuration::get('SMARTSUPP_KEY');
         $this->smarty->assign(array('smartsupp_js' => $this->getSmartsuppJs($smartsupp_key)));
