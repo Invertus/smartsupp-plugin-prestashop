@@ -439,7 +439,8 @@ class Smartsupp extends Module
         $psAccountsPresenter = $accountsFacade->getPsAccountsPresenter();
         $psAccountsService = $accountsFacade->getPsAccountsService();
 
-        $existing = $this->context->smarty->getTemplateVars('smartsupp') ?? [];
+        $smartsuppVar = $this->context->smarty->getTemplateVars('smartsupp');
+        $existing = $smartsuppVar !== null ? $smartsuppVar : [];
 
         $this->context->smarty->assign('smartsupp', array_merge_recursive($existing, [
             'url' => [
@@ -474,20 +475,26 @@ class Smartsupp extends Module
         /** @var PresenterService $eventbusPresenterService */
         $eventbusPresenterService = $eventbusModule->getService(PresenterService::class);
 
-        $existing = $this->context->smarty->getTemplateVars('smartsupp') ?? [];
+        $smartsuppVar = $this->context->smarty->getTemplateVars('smartsupp');
+        $existing = $smartsuppVar !== null ? $smartsuppVar : [];
 
         $this->context->smarty->assign('smartsupp', array_merge_recursive($existing, [
             'url' => [
-                'cloudSyncPathCDC' => self::PRESTASHOP_CLOUDSYNC_CDC,
-            ],
+                'cloudSyncPathCDC' => defined('self::PRESTASHOP_CLOUDSYNC_CDC')
+                    ? self::PRESTASHOP_CLOUDSYNC_CDC
+                    : '',
+                ],
         ]));
+
         $previousJsDef = isset(\Media::getJsDef()['smartsupp']) ? \Media::getJsDef()['smartsupp'] : [];
 
         \Media::addJsDef([
             'contextPsEventbus' => $eventbusPresenterService->expose($this, ['info']),
             'smartsupp' => array_merge($previousJsDef, [
                 'url' => [
-                    'cloudSyncPathCDC' => self::PRESTASHOP_CLOUDSYNC_CDC,
+                    'cloudSyncPathCDC' => defined('self::PRESTASHOP_CLOUDSYNC_CDC')
+                        ? self::PRESTASHOP_CLOUDSYNC_CDC
+                        : '',
                 ],
             ]),
         ]);

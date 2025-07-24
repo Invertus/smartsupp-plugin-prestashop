@@ -1,6 +1,8 @@
 <div id="prestashop-cloudsync"></div>
 
-<script src="{$smartsupp.url.cloudSyncPathCDC|escape:'htmlall':'UTF-8'}"></script>
+{if isset($smartsupp.url.cloudSyncPathCDC)}
+    <script src="{$smartsupp.url.cloudSyncPathCDC|escape:'htmlall':'UTF-8'}"></script>
+{/if}
 
 <script>
     const cdc = window.cloudSyncSharingConsent;
