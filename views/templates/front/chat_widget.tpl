@@ -16,3 +16,8 @@
 ?>
 
 {$smartsupp_js nofilter}
+{if isset($smartsupp_optional_api) && $smartsupp_optional_api}
+<script type="text/javascript">
+{$smartsupp_optional_api nofilter}
+</script>
+{/if}

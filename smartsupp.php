@@ -365,17 +365,16 @@ class Smartsupp extends Module
             }
         }
 
-        $custom_code = '<script type="text/javascript">';
-        $custom_code .= trim(Configuration::get('SMARTSUPP_OPTIONAL_API'));
-        $custom_code .= '</script>';
-
-        return $chat->render() . $custom_code;
+        return $chat->render();
     }
 
     public function hookDisplayHeader()
     {
         $smartsupp_key = Configuration::get('SMARTSUPP_KEY');
-        $this->smarty->assign(array('smartsupp_js' => $this->getSmartsuppJs($smartsupp_key)));
+        $this->smarty->assign(array(
+            'smartsupp_js' => $this->getSmartsuppJs($smartsupp_key),
+            'smartsupp_optional_api' => $smartsupp_key ? trim(Configuration::get('SMARTSUPP_OPTIONAL_API')) : '',
+        ));
 
         return $this->display(__FILE__, './views/templates/front/chat_widget.tpl');
     }
@@ -391,10 +390,11 @@ class Smartsupp extends Module
                 ],
             ]);
 
-            $path = $this->_path;
-            $js .= '<script type="text/javascript" src="' . $path . 'views/js/smartsupp.js"></script>';
-            $js .= '<link rel="stylesheet" href="' . $path . 'views/css/smartsupp.css" type="text/css" />';
-            $js .= '<link rel="stylesheet" href="' . $path . 'views/css/smartsupp-nobootstrap.css" type="text/css" />';
+            $this->context->smarty->assign([
+                'smartsupp_module_path' => $this->_path,
+            ]);
+
+            $js .= $this->display(__FILE__, 'views/templates/admin/backoffice_header.tpl');
         }
 
         return $js;

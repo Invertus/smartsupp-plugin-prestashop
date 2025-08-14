@@ -22,6 +22,10 @@
 use Smartsupp\Auth\Api;
 use Smartsupp\LiveChat\Validator\UserCredentialsValidator;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class AdminSmartsuppAjaxController extends ModuleAdminController
 {
     const FILE_NAME = 'AdminSmartsuppAjaxController';
