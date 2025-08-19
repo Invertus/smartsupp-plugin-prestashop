@@ -154,14 +154,14 @@ class Smartsupp extends Module
             || !$this->unregisterHook('displayHeader')
             || !Configuration::deleteByName('SMARTSUPP_KEY')
             || !Configuration::deleteByName('SMARTSUPP_EMAIL')
-            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_ID', '')
-            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_NAME', '')
-            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_EMAIL', '')
-            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_PHONE', '')
-            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_ROLE', '')
-            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_SPENDINGS', '')
-            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_ORDERS', '')
-            || !Configuration::deleteByName('SMARTSUPP_OPTIONAL_API', '')
+            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_ID')
+            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_NAME')
+            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_EMAIL')
+            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_PHONE')
+            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_ROLE')
+            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_SPENDINGS')
+            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_ORDERS')
+            || !Configuration::deleteByName('SMARTSUPP_OPTIONAL_API')
         ) {
             return false;
         }
