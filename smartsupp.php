@@ -21,6 +21,7 @@
 
 use PrestaShop\Module\PsEventbus\Service\PresenterService;
 use PrestaShop\PsAccountsInstaller\Installer\Facade\PsAccounts;
+use Smartsupp\LiveChat\Utility\PriceUtility;
 use Smartsupp\LiveChat\Utility\VersionUtility;
 
 if (!defined('_PS_VERSION_')) {
@@ -353,7 +354,7 @@ class Smartsupp extends Module
                     $chat->setVariable(
                         'spending',
                         $this->l('Spendings'),
-                        Tools::displayPrice(
+                        PriceUtility::displayPrice(
                             $spending,
                             $this->context->currency->id
                         )
@@ -371,10 +372,10 @@ class Smartsupp extends Module
     public function hookDisplayHeader()
     {
         $smartsupp_key = Configuration::get('SMARTSUPP_KEY');
-        $this->smarty->assign(array(
+        $this->smarty->assign([
             'smartsupp_js' => $this->getSmartsuppJs($smartsupp_key),
             'smartsupp_optional_api' => $smartsupp_key ? trim(Configuration::get('SMARTSUPP_OPTIONAL_API')) : '',
-        ));
+        ]);
 
         return $this->display(__FILE__, './views/templates/front/chat_widget.tpl');
     }
