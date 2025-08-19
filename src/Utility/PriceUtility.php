@@ -25,15 +25,28 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class VersionUtility
+class PriceUtility
 {
-    public static function isPsVersionGreaterThan($version)
+    public static function displayPrice($price, $currency = null)
     {
-        return version_compare(_PS_VERSION_, $version, '>');
-    }
+        if (VersionUtility::isPsVersionGreaterOrEqualTo('9.0.0')) {
+            $context = \Context::getContext();
+            $isoCode = $currency && isset($currency->iso_code)
+                ? $currency->iso_code
+                : $context->currency->iso_code;
 
-    public static function isPsVersionGreaterOrEqualTo($version)
-    {
-        return version_compare(_PS_VERSION_, $version, '>=');
+            $locale = $context->getCurrentLocale();
+
+            if (!$locale) {
+                return (string) $price;
+            }
+
+            return $locale->formatPrice(
+                $price,
+                $isoCode
+            );
+        }
+
+        return \Tools::displayPrice($price, $currency);
     }
 }

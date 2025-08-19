@@ -21,6 +21,7 @@
 
 use PrestaShop\Module\PsEventbus\Service\PresenterService;
 use PrestaShop\PsAccountsInstaller\Installer\Facade\PsAccounts;
+use Smartsupp\LiveChat\Utility\PriceUtility;
 use Smartsupp\LiveChat\Utility\VersionUtility;
 
 if (!defined('_PS_VERSION_')) {
@@ -153,14 +154,14 @@ class Smartsupp extends Module
             || !$this->unregisterHook('displayHeader')
             || !Configuration::deleteByName('SMARTSUPP_KEY')
             || !Configuration::deleteByName('SMARTSUPP_EMAIL')
-            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_ID', '')
-            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_NAME', '')
-            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_EMAIL', '')
-            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_PHONE', '')
-            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_ROLE', '')
-            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_SPENDINGS', '')
-            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_ORDERS', '')
-            || !Configuration::deleteByName('SMARTSUPP_OPTIONAL_API', '')
+            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_ID')
+            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_NAME')
+            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_EMAIL')
+            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_PHONE')
+            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_ROLE')
+            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_SPENDINGS')
+            || !Configuration::deleteByName('SMARTSUPP_CUSTOMER_ORDERS')
+            || !Configuration::deleteByName('SMARTSUPP_OPTIONAL_API')
         ) {
             return false;
         }
@@ -353,7 +354,7 @@ class Smartsupp extends Module
                     $chat->setVariable(
                         'spending',
                         $this->l('Spendings'),
-                        Tools::displayPrice(
+                        PriceUtility::displayPrice(
                             $spending,
                             $this->context->currency->id
                         )
@@ -365,17 +366,16 @@ class Smartsupp extends Module
             }
         }
 
-        $custom_code = '<script type="text/javascript">';
-        $custom_code .= trim(Configuration::get('SMARTSUPP_OPTIONAL_API'));
-        $custom_code .= '</script>';
-
-        return $chat->render() . $custom_code;
+        return $chat->render();
     }
 
     public function hookDisplayHeader()
     {
         $smartsupp_key = Configuration::get('SMARTSUPP_KEY');
-        $this->smarty->assign(array('smartsupp_js' => $this->getSmartsuppJs($smartsupp_key)));
+        $this->smarty->assign([
+            'smartsupp_js' => $this->getSmartsuppJs($smartsupp_key),
+            'smartsupp_optional_api' => $smartsupp_key ? trim(Configuration::get('SMARTSUPP_OPTIONAL_API')) : '',
+        ]);
 
         return $this->display(__FILE__, './views/templates/front/chat_widget.tpl');
     }
@@ -391,10 +391,11 @@ class Smartsupp extends Module
                 ],
             ]);
 
-            $path = $this->_path;
-            $js .= '<script type="text/javascript" src="' . $path . 'views/js/smartsupp.js"></script>';
-            $js .= '<link rel="stylesheet" href="' . $path . 'views/css/smartsupp.css" type="text/css" />';
-            $js .= '<link rel="stylesheet" href="' . $path . 'views/css/smartsupp-nobootstrap.css" type="text/css" />';
+            $this->context->smarty->assign([
+                'smartsupp_module_path' => $this->_path,
+            ]);
+
+            $js .= $this->display(__FILE__, 'views/templates/admin/backoffice_header.tpl');
         }
 
         return $js;

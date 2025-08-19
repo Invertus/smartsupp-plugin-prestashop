@@ -21,6 +21,10 @@
 
 namespace Smartsupp\LiveChat\Validator;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class UserCredentialsValidator
 {
     const FILE_NAME = 'UserCredentialsValidator';
